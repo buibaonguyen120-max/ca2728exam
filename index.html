@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exam practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#faf5f1;--card:#fff;--ink:#2b2327;--mut:#85797f;--pri:#c0305a;--pri2:#e0527a;--tint:#fcebf0;--line:#efe5df;--warn:#fdf3d4;--y:#f7de80;--g:#a9e0b2;--b:#9fcaf3;--p:#f5b3d0;--sh:0 1px 2px #2b232710,0 10px 28px #2b23271c;--r:18px}
+@media(prefers-color-scheme:dark){:root{--bg:#1b1518;--card:#272024;--ink:#f3eaec;--mut:#a99ca2;--tint:#3b2330;--line:#3a2e34;--warn:#4a3d1a;--sh:0 10px 28px #0007}}
+html,body{height:100%;margin:0}*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 Lexend,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#app{min-height:100%;display:flex;flex-direction:column}button,input,select,textarea{font:inherit;color:inherit}h1,h2{margin:.2em 0}
+.wrap{width:100%;max-width:700px;margin:4vh auto;padding:0 16px;display:grid;gap:14px}.hero{text-align:center;padding:30px 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
+.logo{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));display:inline-grid;place-items:center}.logo.big{width:68px;height:68px;font-size:32px;margin-bottom:10px}
+.btn{border:0;background:transparent;border-radius:99px;padding:9px 16px;cursor:pointer;transition:.15s;white-space:nowrap}.btn:hover{background:var(--bg)}.btn:active{scale:.95}.btn:disabled{opacity:.35}.btn.on{background:var(--tint);color:var(--pri)}
+.btn.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-weight:600;box-shadow:0 5px 14px #c0305a55}.btn.lg{padding:13px 28px;font-size:16px;margin-top:12px}
+input[type=text],input[type=datetime-local],select,textarea{border:1.5px solid var(--line);border-radius:10px;padding:7px 11px;background:var(--card)}input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px #c0305a22}
+.hint{font-size:12px;color:var(--mut)}.badc{color:#b32323}.okc{color:#1c7a3a}.top2{display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);margin:6px 0;cursor:pointer}.grow{flex:1;min-width:0}
+.pill{display:inline-flex;padding:3px 11px;border-radius:99px;font-size:12px;font-weight:500;background:var(--bg);border:1px solid var(--line);color:var(--mut)}.pill.r{background:#fde3ea;color:#b0254c;border:0}.pill.v{background:#e5e3fb;color:#4b43b3;border:0}.pill.w{background:#fdeed0;color:#8a5a00;border:0}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 22px;gap:10px}.mid{text-align:center;line-height:1.25}.mid small{display:block;color:var(--pri);font-weight:600;letter-spacing:.08em;font-size:11px}
+.clock{background:var(--warn);padding:5px 14px;border-radius:99px;font-weight:600;font-variant-numeric:tabular-nums}.clock.low{background:#f6c9c9;color:#8a1414}
+.prog{height:5px;background:var(--line)}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .45s}
+main{flex:1;padding:22px;display:grid;gap:20px;grid-template-columns:1fr 1fr;align-content:start;align-items:start;width:100%;max-width:1120px;margin:0 auto}@media(max-width:780px){main{grid-template-columns:1fr;padding:14px}.top{padding:10px 14px}}
+.qs{display:grid;gap:16px}.pass p{margin:.7em 0;line-height:1.75}mark{border-radius:4px;color:inherit}.my{background:var(--y)}.mg{background:var(--g)}.mb{background:var(--b)}.mp{background:var(--p)}
+.qh{display:flex;gap:8px;align-items:center}.pt{margin-left:auto;font-size:12px;color:var(--mut)}.qn{font-size:11px;letter-spacing:.1em;color:var(--mut);margin:12px 0 6px}.qb p{margin:.3em 0 .6em;font-weight:500}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin:8px 0;padding:11px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer;transition:.15s}.opt:hover{border-color:#e3a9bb}.opt.sel{border-color:var(--pri);background:var(--tint)}
+.L{width:28px;height:28px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}.sel .L{background:var(--pri);color:#fff}.opt.tf{display:inline-flex;width:auto;margin:6px 8px 0 0}
+.tok{cursor:pointer;padding:2px 3px;border-radius:6px}.tok:hover{background:var(--tint)}.tok.on{background:#cdbdf5;color:#222}
+.bar{position:relative;display:flex;align-items:center;gap:4px;margin:6px auto 16px;padding:7px 8px;background:var(--card);border:1px solid var(--line);border-radius:99px;box-shadow:var(--sh);max-width:calc(100% - 20px);flex-wrap:wrap;justify-content:center}
+.pop{position:absolute;bottom:calc(100% + 10px);left:50%;translate:-50% 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:var(--sh);z-index:5;max-width:92vw;text-align:center}
+.dot{display:inline-block;width:24px;height:24px;border-radius:50%;margin:0 4px;border:3px solid transparent;cursor:pointer;vertical-align:middle}.dot.act{border-color:var(--ink)}
+.g{display:inline-block;width:34px;height:34px;line-height:34px;text-align:center;margin:3px;border-radius:50%;background:var(--bg);cursor:pointer}.g.d{background:#d4f0db;color:#14532d}.g.c{background:var(--pri);color:#fff}
+#veil{position:fixed;inset:0;background:#1e161ab8;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;text-align:center;z-index:9;padding:20px}#veil>div{background:var(--card);padding:28px;border-radius:var(--r);max-width:420px}
+.ring{--p:0;width:130px;height:130px;border-radius:50%;margin:0 auto 12px;background:conic-gradient(var(--pri) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;position:relative}.ring::before{content:"";position:absolute;inset:11px;background:var(--card);border-radius:50%}.ring b{position:relative;font-size:28px}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}.code{font-size:40px;letter-spacing:.2em;font-weight:600;text-align:center}
+</style></head><body><div id="veil"><div><h2>Exam hidden</h2><p class="hint">You left the exam window or full screen. This was logged for your teacher.</p><button class="btn pri" onclick="back()">Continue</button></div></div><div id="app"></div>
+<script>
+// ===== Project settings (public values; safe to keep in the page) =====
+const CFG={url:"https://okptwwymlluhcowtdjbv.supabase.co",key:"sb_publishable_dxKA0ixhXEpskKgUzO6Z4g_5DF-UOEg"};
+const SB=supabase.createClient(CFG.url,CFG.key);
+const $=q=>document.querySelector(q),A=$("#app"),pr=n=>String(n).padStart(2,"0");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SKC={reading:"r",vocab_grammar:"v",writing:"w"},SKN={reading:"Reading",listening:"Listening",vocab_grammar:"Vocabulary & Grammar",writing:"Writing"};
+let U=null,PR=null,R=null,poll=null;
+const wrap=h=>{A.innerHTML=`<div class="wrap">${h}</div>`};
+async function boot(){const{data:{session}}=await SB.auth.getSession();U=session&&session.user;if(!U)return login();
+ const{data:p}=await SB.from("profiles").select("*").eq("id",U.id).single();PR=p;
+ if(!PR)return wrap(`<div class="card"><b class="badc">No profile found.</b> Did you run 01_schema.sql before your first sign-in? <button class="btn" onclick="out()">Sign out</button></div>`);
+ if(!PR.accepted_terms_at)return terms();PR.role=="student"?home():teacher()}
+function login(){wrap(`<div class="card hero"><div class="logo big">🍃</div><h1>Exam practice</h1><p class="hint">Sign in with your Google account.</p><button class="btn pri lg" onclick="google()">Continue with Google</button></div>`)}
+function google(){SB.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname}})}
+function out(){SB.auth.signOut().then(()=>location.reload())}
+function terms(){wrap(`<div class="card"><h2>Before you start</h2><label class="row"><input type="checkbox" id="c1"> I understand this is a school practice tool.</label><label class="row"><input type="checkbox" id="c2"> I understand my activity during an exam (leaving the tab, pasting, leaving full screen) is recorded and shown to my teacher.</label><button class="btn pri" onclick="agree()">I understand — continue</button></div>`)}
+async function agree(){if(!$("#c1").checked||!$("#c2").checked)return alert("Please tick both boxes.");await SB.from("profiles").update({accepted_terms_at:new Date().toISOString()}).eq("id",U.id);boot()}
+
+// ===== Student: join =====
+function home(){clearInterval(poll);wrap(`<div class="top2"><b>Hi ${esc(PR.full_name||"")}</b><span>${PR.role!="student"?'<button class="btn" onclick="teacher()">Teacher view</button>':""}<button class="btn" onclick="out()">Sign out</button></span></div><div class="card"><h2>Join a challenge</h2><p class="hint">Enter the code your teacher gives you.</p><input id="code" type="text" maxlength="6" placeholder="ABC123" autocapitalize="characters" style="text-transform:uppercase;font-size:20px;letter-spacing:.2em;width:11em"> <button class="btn pri" onclick="join()">Join</button><p id="msg" class="badc"></p></div>`)}
+async function join(){const{data,error}=await SB.rpc("join_run",{p_code:$("#code").value});if(error){$("#msg").textContent=error.message;return}
+ let aid=data.attempt_id;if(data.mode!="live"){const r=await SB.rpc("start_attempt",{p_run:data.run_id});if(r.error){$("#msg").textContent=r.error.message;return}aid=r.data}
+ open(aid)}
+async function open(aid){clearInterval(poll);const{data,error}=await SB.rpc("get_paper",{p_attempt:aid});if(error)return alert(error.message);
+ if(data.waiting){wrap(`<div class="card hero"><div class="logo big">⏳</div><h2>Waiting room</h2><p class="hint">The exam opens when your teacher starts it. Stay on this page.</p></div>`);poll=setInterval(()=>open(aid),2500);return}
+ const Q=data.questions||[],pg=[],ix={};Q.forEach(q=>{const k=(q.section&&q.section.id)||q.id;if(ix[k]==null){ix[k]=pg.length;pg.push({k,sec:q.section,part:q.part,qs:[]})}pg[ix[k]].qs.push(q)});
+ R={aid,Q,pg,p:0,ans:data.answers||{},hl:data.highlights||{},pend:{},v:Date.now()%1e9,tool:null,pop:"",notes:"",title:data.title,
+    dl:data.deadline_at?new Date(data.deadline_at).getTime():null,off:new Date(data.server_now).getTime()-Date.now(),fs:false,on:false};
+ wrap(`<div class="card hero"><div class="logo big">📝</div><h1>${esc(data.title)}</h1><p class="hint">${Q.length} questions · ${R.dl?"timed":"no time limit"}. Notes are never saved. Leaving the window or full screen is recorded.</p><button class="btn pri lg" onclick="begin()">Enter full screen and start</button></div>`)}
+function begin(){const e=document.documentElement;if(e.requestFullscreen)e.requestFullscreen().then(()=>R.fs=true).catch(()=>{});R.on=true;draw();
+ R.clk=setInterval(tick,1000);R.hb=setInterval(()=>SB.rpc("heartbeat",{p_attempt:R.aid,p_position:R.p}),8000);window.addEventListener("online",flush)}
+function left(){return R.dl?Math.max(0,Math.round((R.dl-(Date.now()+R.off))/1000)):null}
+function tick(){const l=left(),c=$("#clk");if(l==null){if(c)c.textContent="No limit";return}if(c){c.textContent="⏱ "+pr(Math.floor(l/60))+":"+pr(l%60);c.className="clock"+(l<60?" low":"")}if(l<=0)finish()}
+const nq=q=>R.Q.indexOf(q)+1;
+function done(q){const a=R.ans[q.id];if(!a)return false;const t=q.type;if(t=="mcq"||t=="mcq_multi")return(a.choices||[]).length>0;if(t=="tfng")return!!a.choice;if(t=="gap_fill")return Object.values(a.blanks||{}).some(v=>v);if(t=="word_formation")return!!a.form;if(t=="error_id")return(a.marks||[]).length>0;return!!(a.text||"").trim()}
+
+// ===== Student: exam screen =====
+function draw(){const m0=$("main"),sc=m0?m0.scrollTop:0,pg=R.pg[R.p],nd=R.Q.filter(done).length,l=left(),last=R.p==R.pg.length-1;
+ const ps=pg.sec&&pg.sec.passage_md||pg.part&&pg.part.passage_md,ins=(pg.sec&&pg.sec.instruction)||(pg.part&&pg.part.instruction)||"";
+ A.innerHTML=`<div class="top"><b>Springboard</b><div class="mid"><small>PART ${R.p+1} OF ${R.pg.length}</small><span class="hint">${esc(ins)}</span></div><div style="justify-self:end"><span class="hint" id="sv"></span> <span class="clock" id="clk">${l==null?"No limit":"⏱ "+pr(Math.floor(l/60))+":"+pr(l%60)}</span></div></div><div class="prog"><i style="width:${Math.round(nd/R.Q.length*100)}%"></i></div>
+ <main class="paper"><div class="card pass">${ps?`<div class="top2"><b>📖 Text</b><a href="#" style="font-size:12px;color:var(--pri)" onclick="clr();return false">Clear highlights</a></div><div class="hint">✎ Select text to highlight</div><div id="ps">${R.hl[pg.k]||ps.split(/\n\n+/).map(p=>"<p>"+esc(p)+"</p>").join("")}</div>`:`<b>${esc(pg.sec&&pg.sec.title||"")}</b><p>${esc(ins)}</p>`}</div><div class="qs">${pg.qs.map(card).join("")}</div></main>
+ <div class="bar">${pop()}<button class="btn" ${R.p==0?"disabled":""} onclick="R.p--;draw()">← Previous</button><button class="btn ${R.pop=="grid"?"on":""}" onclick="tp('grid')">▦ ${nd}/${R.Q.length} done</button><button class="btn ${R.tool?"on":""}" onclick="tp('hl')">✎ Highlight</button><button class="btn" onclick="tp('notes')">📝 Notes ${R.notes?"•":""}</button><button class="btn pri" onclick="${last?"review()":"R.p++;draw()"}">${last?"Submit answers":"Next →"}</button></div>`;
+ const m=$("main");if(m)m.scrollTop=sc;const e=$("#ps");if(e){e.onmouseup=hlSel;e.onclick=ev=>{if(R.tool=="x"&&ev.target.tagName=="MARK"){ev.target.replaceWith(...ev.target.childNodes);hs()}}}}
+function pop(){if(R.pop=="grid")return`<div class="pop">${R.Q.map((q,i)=>`<span class="g ${done(q)?"d":""} ${R.pg[R.p].qs.includes(q)?"c":""}" onclick="R.p=R.pg.findIndex(g=>g.qs.includes(R.Q[${i}]));R.pop='';draw()">${i+1}</span>`).join("")}</div>`;
+ if(R.pop=="hl")return`<div class="pop">${[["y","my"],["g","mg"],["b","mb"],["p","mp"]].map(c=>`<span class="dot ${R.tool==c[1]?"act":""}" style="background:var(--${c[0]})" onclick="R.tool='${c[1]}';draw()"></span>`).join("")}<button class="btn" onclick="R.tool='x';draw()">Eraser</button><button class="btn" onclick="R.tool=null;R.pop='';draw()">Off</button></div>`;
+ if(R.pop=="notes")return`<div class="pop"><div class="hint">Kept for this session only, not saved or submitted</div><textarea rows="5" cols="32" spellcheck="false" oninput="R.notes=this.value">${esc(R.notes)}</textarea></div>`;return""}
+const tp=p=>{R.pop=R.pop==p?"":p;draw()};
+function hlSel(){if(!R.tool||R.tool=="x")return;const s=getSelection();if(!s.rangeCount||s.isCollapsed)return;const r=s.getRangeAt(0),m=document.createElement("mark");m.className=R.tool;try{r.surroundContents(m)}catch(e){}s.removeAllRanges();hs()}
+function hs(){R.hl[R.pg[R.p].k]=$("#ps").innerHTML;clearTimeout(R.ht);R.ht=setTimeout(()=>SB.rpc("save_highlights",{p_attempt:R.aid,p_highlights:R.hl}),800)}
+function clr(){delete R.hl[R.pg[R.p].k];SB.rpc("save_highlights",{p_attempt:R.aid,p_highlights:R.hl});draw()}
+const inp='spellcheck="false" autocorrect="off" autocapitalize="off"';
+function card(q){const a=R.ans[q.id]||{},c=q.content||{},t=q.type,id=q.id;let b="";
+ if(t=="mcq"||t=="mcq_multi")b=`<p>${esc(c.prompt)}</p>`+(c.options||[]).map(o=>`<button class="opt ${(a.choices||[]).includes(o.key)?"sel":""}" onclick="pick('${id}','${o.key}',${t=="mcq_multi"})"><span class="L">${esc(o.key)}</span><span>${esc(o.text)}</span></button>`).join("");
+ if(t=="tfng")b=`<p>${esc(c.statement)}</p>`+["TRUE","FALSE","NOT_GIVEN"].map(o=>`<button class="opt tf ${a.choice==o?"sel":""}" onclick="put('${id}',{choice:'${o}'},1)">${o.replace("_"," ")}</button>`).join("");
+ if(t=="gap_fill")b=String(c.text||"").split(/___(\d+)___/).map((x,j)=>j%2?`<input type="text" size="9" ${inp} value="${esc((a.blanks||{})[x]||"")}" oninput="gap('${id}','${x}',this.value)">`:esc(x)).join("");
+ if(t=="word_formation"){const bank=c.bank||(q.section&&q.section.word_bank)||[];b=`<p>${esc(c.text)}</p><select onchange="wf('${id}','base',this.value)"><option value="">Base word…</option>${bank.map(w=>`<option ${a.base==w?"selected":""}>${esc(w)}</option>`).join("")}</select> <input type="text" placeholder="your form" ${inp} value="${esc(a.form||"")}" oninput="wf('${id}','form',this.value)">`}
+ if(t=="error_id"){const tk=String(c.text||"").split(/\s+/),on=(a.marks||[]).flatMap(m=>m.tokens);b=`<p class="hint">Click the wrong word(s); a mistake can be more than one word.</p><p>${tk.map((w,i)=>`<span class="tok ${on.includes(i)?"on":""}" onclick="errTok('${id}',${i})">${esc(w)}</span>`).join(" ")}</p>`+(a.marks||[]).map((m,j)=>`<div>${j+1}. <s>${m.tokens.map(i=>esc(tk[i])).join(" ")}</s> → <input type="text" ${inp} value="${esc(m.correction)}" oninput="errCorr('${id}',${j},this.value)"></div>`).join("")}
+ if(t=="essay"||t=="sentence_transformation")b=`<p>${esc(c.prompt||c.text||"")}</p><textarea rows="${t=="essay"?6:3}" style="width:100%" ${inp} oninput="put('${id}',{text:this.value},0)">${esc(a.text||"")}</textarea>`;
+ if(["paragraph_gap","matching"].includes(t))b=`<p class="hint">This question type is not built yet in this version.</p>`;
+ return`<div class="card"><div class="qh"><span class="pill ${SKC[q.skill]||""}">${SKN[q.skill]||q.skill}</span><span class="pt">${q.points} point${q.points>1?"s":""}</span></div><div class="qn">QUESTION ${nq(q)}</div><div class="qb">${b}</div></div>`}
+function pick(id,k,multi){let a=R.ans[id]||{choices:[]},c=a.choices||[];c=multi?(c.includes(k)?c.filter(x=>x!=k):[...c,k]):[k];put(id,{choices:c},1)}
+function gap(id,n,v){const a=R.ans[id]||{blanks:{}};a.blanks=a.blanks||{};a.blanks[n]=v;put(id,a,0)}
+function wf(id,k,v){const a=R.ans[id]||{};a[k]=v;put(id,a,0)}
+function errTok(id,i){const cur=R.ans[id]||{marks:[]},corr={};(cur.marks||[]).forEach(m=>corr[m.tokens[0]]=m.correction);let t=(cur.marks||[]).flatMap(m=>m.tokens);t=t.includes(i)?t.filter(x=>x!=i):[...t,i];t.sort((a,b)=>a-b);const g=[];t.forEach(x=>{const l=g[g.length-1];l&&l[l.length-1]==x-1?l.push(x):g.push([x])});put(id,{marks:g.map(a=>({tokens:a,correction:corr[a[0]]||""}))},1)}
+function errCorr(id,j,v){R.ans[id].marks[j].correction=v;put(id,R.ans[id],0)}
+// saving: every answer goes to the server at once; offline answers wait and retry
+function st(m){const e=$("#sv");if(e)e.textContent=m}
+function put(id,r,re){R.ans[id]=r;R.pend[id]=r;clearTimeout(R.tm);R.tm=setTimeout(flush,500);st("Saving…");if(re)draw()}
+async function flush(){for(const id of Object.keys(R.pend)){const r=R.pend[id];const{error}=await SB.rpc("save_answer",{p_attempt:R.aid,p_question:id,p_response:r,p_version:++R.v});
+  if(error){if(/time is up|already submitted/.test(error.message))return finish(true);st("Offline — will retry");setTimeout(flush,4000);return}if(R.pend[id]===r)delete R.pend[id]}st("Saved")}
+function review(){const n=R.Q.filter(q=>!done(q)).length;if(confirm((n?n+" question(s) still blank. ":"")+"Submit now? You cannot change answers afterwards."))finish()}
+async function finish(quiet){if(!R||R.fin)return;R.fin=1;clearInterval(R.clk);clearInterval(R.hb);R.on=false;if(document.fullscreenElement)document.exitFullscreen();
+ await flush();await SB.rpc("submit_attempt",{p_attempt:R.aid});result(R.aid)}
+async function result(aid){const{data,error}=await SB.rpc("get_result",{p_attempt:aid});if(error)return wrap(`<div class="card badc">${esc(error.message)}</div>`);
+ if(!data.released)return wrap(`<div class="card hero"><div class="logo big">✅</div><h2>Submitted</h2><p class="hint">Score not released yet. Your teacher will share it.</p><button class="btn" onclick="home()">Back</button></div>`);
+ const pc=data.possible?Math.round(data.points/data.possible*100):0;
+ wrap(`<div class="card hero"><div class="ring" style="--p:${pc}"><b>${pc}%</b></div><h2>${data.points} / ${data.possible} points</h2><p class="hint">${data.provisional?"Provisional: some answers still await your teacher.":""}</p></div><div class="card"><table><tr><th>#</th><th>Skill</th><th>Points</th><th></th></tr>${(data.questions||[]).map((q,i)=>`<tr><td>${i+1}</td><td>${SKN[q.skill]||q.skill}</td><td>${q.points==null?"–":q.points+"/"+q.max}</td><td>${q.points==null?"Awaiting teacher":q.is_correct?'<span class="okc">✓</span>':q.points>0?"Partial":'<span class="badc">✗</span>'}${q.key?`<div class="hint">Key: ${esc(JSON.stringify(q.key))}</div>`:""}${q.explanation?`<div class="hint">${esc(q.explanation)}</div>`:""}</td></tr>`).join("")}</table></div><button class="btn pri" onclick="home()">Done</button>`)}
+// anti-cheat: record, never conclude
+const risk=k=>{if(R&&R.on)SB.rpc("log_risk",{p_attempt:R.aid,p_kind:k})};
+function hide(k){if(!R||!R.on)return;risk(k);$("#veil").style.display="flex"}
+function back(){$("#veil").style.display="none";if(R&&R.fs&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{})}
+addEventListener("blur",()=>hide("window_blur"));document.addEventListener("visibilitychange",()=>{if(document.hidden)hide("tab_hidden")});
+document.addEventListener("fullscreenchange",()=>{if(R&&R.fs&&R.on&&!document.fullscreenElement)hide("fullscreen_exit")});
+document.addEventListener("contextmenu",e=>{if(R&&R.on)e.preventDefault()});
+document.addEventListener("copy",e=>{if(R&&R.on&&!e.target.closest("input,textarea")){e.preventDefault();risk("copy_attempt")}});
+document.addEventListener("paste",e=>{if(R&&R.on&&e.target.closest("input,textarea")){risk("paste")}});
+
+// ===== Teacher =====
+async function teacher(){clearInterval(poll);const[T,Rn]=await Promise.all([SB.from("tests").select("id,title,default_time_limit_min").order("created_at",{ascending:false}),SB.from("runs").select("id,join_code,mode,status,title:snapshot->>title").order("created_at",{ascending:false}).limit(20)]);
+ wrap(`<div class="top2"><b>Teacher · ${esc(PR.full_name||"")}</b><span><button class="btn" onclick="home()">Student view</button><button class="btn" onclick="out()">Sign out</button></span></div><div class="card"><h2>Your tests</h2>${(T.data||[]).map(t=>`<div class="row" style="cursor:default"><span class="grow">${esc(t.title)} <span class="hint">${t.default_time_limit_min||"no"} min</span></span><button class="btn" onclick="mk('${t.id}','live')">Live challenge</button><button class="btn" onclick="mk('${t.id}','homework')">Homework</button></div>`).join("")||'<p class="hint">No tests yet. Run 03_seed_demo.sql in Supabase.</p>'}</div><div class="card"><h2>Recent runs</h2>${(Rn.data||[]).map(r=>`<div class="row" onclick="runv('${r.id}')"><b>${r.join_code}</b><span class="grow">${esc(r.title)}</span><span class="pill">${r.mode} · ${r.status}</span></div>`).join("")||'<p class="hint">None yet.</p>'}</div>`)}
+async function mk(id,mode){const{data,error}=await SB.rpc("create_run",{p_test:id,p_mode:mode});if(error)return alert(error.message);runv(data.id)}
+async function runv(id){clearInterval(poll);wrap(`<div class="top2"><button class="btn" onclick="teacher()">← Back</button><span id="ctl"></span></div><div class="card"><div class="hint">Join code</div><div class="code" id="jc"></div><p class="hint" id="info"></p></div><div class="card" id="live"></div><div id="grade"></div>`);
+ const draw=async()=>{const{data:r}=await SB.from("runs").select("*").eq("id",id).single(),{data:at}=await SB.from("attempts").select("id,status,current_position,points_earned,points_possible,provisional,counted,attempt_no,last_seen_at,profiles(full_name)").eq("run_id",id).is("deleted_at",null).order("started_at");if(!r)return;
+  $("#jc").textContent=r.join_code;$("#info").textContent=`${r.mode} · ${r.status} · limit ${r.time_limit_min||"none"} min${r.due_at?" · due "+new Date(r.due_at).toLocaleString():""}`;
+  $("#ctl").innerHTML=(r.status=="lobby"?`<button class="btn pri" onclick="act('start_run','${id}')">Start</button>`:"")+(r.status!="ended"?`<button class="btn" onclick="lim('${id}')">Time limit</button><button class="btn" onclick="act('set_time_limit','${id}',${(r.time_limit_min||0)+5})">+5 min</button>${r.mode!="live"?`<button class="btn" onclick="due('${id}')">Due date</button>`:""}<button class="btn" onclick="if(confirm('End for everyone? This cannot be undone.'))act('end_run','${id}')">End</button>`:"");
+  $("#live").innerHTML=`<h2>Students (${(at||[]).length})</h2><table><tr><th>Name</th><th>Progress</th><th>Score</th><th>Status</th></tr>${(at||[]).map(a=>{const on=a.last_seen_at&&Date.now()-new Date(a.last_seen_at)<20000;return`<tr onclick="gr('${a.id}','${id}')" style="cursor:pointer"><td>${on?"🟢":"⚪"} ${esc(a.profiles&&a.profiles.full_name||"Guest")}${a.attempt_no>1?" #"+a.attempt_no:""}</td><td>Q ${a.current_position+1}</td><td>${a.points_earned}/${a.points_possible}${a.provisional?" *":""}</td><td>${a.status}${a.counted?" ✓":""}</td></tr>`}).join("")}</table><p class="hint">* provisional — click a student to grade written answers.</p>`};
+ await draw();poll=setInterval(draw,4000)}
+async function act(fn,id,m){const a=fn=="set_time_limit"?{p_run:id,p_minutes:m}:{p_run:id};const{error}=await SB.rpc(fn,a);if(error)alert(error.message)}
+function lim(id){const v=prompt("Time limit in minutes (leave empty for no limit)");if(v===null)return;act("set_time_limit",id,v===""?null:parseInt(v))}
+async function due(id){const v=prompt("Due date and time, e.g. 2026-11-20 23:59 (leave empty to remove)");if(v===null)return;const d=v?new Date(v.replace(" ","T")):null;if(d&&isNaN(d))return alert("Could not read that date.");const{error}=await SB.rpc("set_due",{p_run:id,p_due:d?d.toISOString():null});if(error)alert(error.message)}
+async function gr(aid,rid){const[{data:r},{data:an}]=await Promise.all([SB.from("runs").select("snapshot").eq("id",rid).single(),SB.from("answers").select("question_id,response,points,comment").eq("attempt_id",aid)]);
+ const man=(r.snapshot.questions||[]).filter(q=>["essay","sentence_transformation"].includes(q.type));
+ $("#grade").innerHTML=`<div class="card"><h2>Written answers</h2>${man.map(q=>{const a=(an||[]).find(x=>x.question_id==q.id);return`<div class="row" style="display:block;cursor:default"><b>${esc((q.content||{}).prompt||(q.content||{}).text||"")}</b><p>${esc(a&&a.response&&a.response.text||"(no answer)")}</p>Points (max ${q.points}): <input type="text" size="4" value="${a&&a.points!=null?a.points:""}" id="p${q.id}"> <input type="text" placeholder="comment" value="${esc(a&&a.comment||"")}" id="c${q.id}"> <button class="btn pri" onclick="sg('${aid}','${q.id}')">Save</button></div>`}).join("")||'<p class="hint">No written questions.</p>'}</div>`}
+async function sg(aid,qid){const{error}=await SB.rpc("grade_answer",{p_attempt:aid,p_question:qid,p_points:parseFloat($("#p"+qid).value),p_comment:$("#c"+qid).value});alert(error?error.message:"Saved")}
+boot();
+</script></body></html>
