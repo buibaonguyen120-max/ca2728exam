@@ -584,7 +584,7 @@ function rtxt(q,r){if(!r)return"–";if(r.text!=null)return r.text;if(r.choices)
 
 boot();
 </script></body></html>
-<!-- ===== SKIN FINAL (v3 + v4): dán MỘT LẦN, ngay trước </body> ===== -->
+<<!-- ===== SKIN V3: dán nguyên khối này ngay trước </body> trong index.html ===== -->
 <style id="skin-v3">
 :root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.4,.64,1);--sh:0 1px 1px rgba(60,35,48,.04),0 2px 6px rgba(60,35,48,.04),0 14px 34px -8px rgba(60,35,48,.13)}
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
@@ -598,7 +598,10 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.015em}p{text-wrap:pretty}
 .btn{transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .14s var(--ease)}
 .opt{transition:border-color .18s,background-color .18s,box-shadow .18s,transform .14s var(--ease)}
 .row,.rcard,.stat,.card,.chip,.tab,.ni,.tok,.g,.dot{transition-property:background-color,border-color,color,box-shadow,transform,opacity;transition-duration:.18s}
+.mn.enter{animation:mnin .3s var(--ease) both}
 .mn.enter .row,.mn.enter .rcard,.mn.enter .card{animation:none!important}
+.mn.enter .stat{animation:mnin .55s var(--ease) both!important}
+.mn.enter .stat:nth-child(2){animation-delay:.07s!important}.mn.enter .stat:nth-child(3){animation-delay:.14s!important}
 @keyframes mnin{from{opacity:0;transform:translateY(10px)}}
 @media(hover:hover){.rcard:hover,.card.jn:hover{transform:translateY(-2px)}}
 @media(hover:none){.btn:not(.pri):hover{background:var(--card);color:inherit;border-color:var(--line)}.opt:not(.sel):hover{border-color:var(--line)}.row:hover,.tok:hover{background:transparent}.rcard:hover{transform:none;border-color:var(--line)}}
@@ -608,6 +611,7 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.015em}p{text-wrap:pretty}
 .exam .top{background:var(--card);border-bottom:1px solid var(--line)}
 .prog{height:6px}.prog i{border-radius:0 6px 6px 0;transition:width .55s var(--ease)}
 .pass #ps p{font-family:Newsreader,Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.85;max-width:68ch}
+.qs .card{content-visibility:auto;contain-intrinsic-size:auto 240px}
 .opt{padding:13px 16px;min-height:52px}.opt:active{transform:scale(.985)}
 .opt.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 16%,transparent)}
 .L{transition:background-color .18s,color .18s,transform .3s var(--spring)}.sel .L{transform:scale(1.1)}
@@ -633,11 +637,11 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.015em}p{text-wrap:pretty}
 (()=>{
 const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
 const lk=document.createElement("link");lk.rel="stylesheet";lk.href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500&display=swap";document.head.appendChild(lk);
-const fx=(el,kf,o)=>{if(RM||!el||!el.animate)return;el.animate(kf,Object.assign({duration:170,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"},o||{}))};
+const fx=(el,kf,o)=>{if(RM||!el||!el.animate)return;el.animate(kf,Object.assign({duration:280,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"},o||{}))};
 
 // 1) Qua trang / mở bảng: trượt mượt theo hướng Next/Previous
 const _d=draw;draw=function(){const pv=R&&R.lp,pp=(R&&R._pp)||"";_d.apply(this,arguments);if(!R||!R.pg)return;
- if(pv!=null&&pv!==R.p){const d=R.p>pv?1:-1;document.querySelectorAll(".qp,.pp,.ins").forEach(e=>fx(e,[{opacity:.25,transform:`translateX(${d*14}px)`},{opacity:1,transform:"none"}]))}
+ if(pv!=null&&pv!==R.p){const d=R.p>pv?1:-1;document.querySelectorAll(".qp,.pp,.ins").forEach(e=>fx(e,[{opacity:0,transform:`translateX(${d*26}px)`},{opacity:1,transform:"none"}]))}
  if(!pp&&R.pop)fx($(".pop"),[{opacity:0,transform:"translateY(8px) scale(.96)"},{opacity:1,transform:"none"}],{duration:200});
  R._pp=R.pop||""};
 
@@ -663,100 +667,5 @@ const ring=r=>{r.dataset.d=1;const to=parseFloat(r.style.getPropertyValue("--p")
 let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;
  document.querySelectorAll(".ring:not([data-d])").forEach(ring);
  document.querySelectorAll(".hero h2").forEach(h=>h.closest(".hero").classList.toggle("wait",/Waiting|Submitting/.test(h.textContent)))})}).observe(A,{childList:true,subtree:true});
-})();
-</script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
-<style id="skin-v4">
-/* màu: nền xanh xám, thẻ trắng có viền rõ, chữ navy đậm */
-:root{--bg:#eceff6;--card:#fff;--ink:#12172b;--mut:#596280;--line:#d9dfec;--pri:#4f46e5;--pri2:#6a61f4;--pri-d:#352ea8;--tint:#e7e6fd;--sh:0 1px 0 rgba(18,23,43,.05),0 12px 28px -14px rgba(18,23,43,.25)}
-body[data-role=s]{--pri:#0e9f78;--pri2:#25bf93;--pri-d:#0a7357;--tint:#d9f4ea}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1020;--card:#161b33;--ink:#eef0fb;--mut:#9aa2c4;--line:#262d4d;--tint:#232a55}}
-:root[data-theme=dark]{--bg:#0d1020;--card:#161b33;--ink:#eef0fb;--mut:#9aa2c4;--line:#262d4d;--tint:#232a55}
-body{font-family:"Be Vietnam Pro",system-ui,sans-serif}
-body::after{display:none}
-.hint{font-size:13px}.pill{font-size:12px}
-.btn{font-weight:600}
-
-/* chữ: tiêu đề lớn, đậm; bỏ nhãn IN HOA */
-.hd h1{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
-.hd2 h2{font-size:19px;font-weight:700}
-.eyebrow{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--mut)}
-.mono{font-weight:600;letter-spacing:.1em;color:var(--ink)}
-
-/* thanh bên tối: tách hẳn khỏi nội dung */
-.side{background:#12172b;border-right:0}
-.sbt b,.who b{color:#fff}.sbt small,.who small{color:#8d95b5}
-.sbh,.sbu{border-color:rgba(255,255,255,.1)}
-.ni{color:#aab1cf}.ni:hover{background:rgba(255,255,255,.08);color:#fff}
-.ni.on{background:var(--pri);color:#fff}.ni.on::before{display:none}
-.av{background:rgba(255,255,255,.14);color:#fff}
-.col{background:var(--card);color:var(--ink)}
-
-/* 3 ô số: khối màu đặc, chữ trắng, là điểm nhấn duy nhất của trang */
-:root:root:root .stat{color:#fff;box-shadow:none;min-height:156px}
-:root:root:root .s1{background:#0e9f78;color:#fff}
-:root:root:root .s2{background:#d9650b;color:#fff}
-:root:root:root .s3{background:#4f46e5;color:#fff}
-:root:root:root .s4{background:#12172b;color:#fff}
-:root:root:root .stat i{background:rgba(255,255,255,.2);color:#fff}
-:root:root:root .stat em{background:rgba(255,255,255,.2);color:#fff}
-.stat b{font-size:46px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-
-/* thẻ lượt thi: vạch màu bên trái = trạng thái */
-.rcard{border-left:5px solid var(--line);padding:16px 18px}
-.rcard:has(.st-live){border-left-color:#0e9f78}.rcard:has(.st-lobby){border-left-color:#d9650b}
-.rcard:has(.st-open){border-left-color:#4f46e5}
-.rcard b:not(.mono){font-weight:600;font-size:15px}
-:root:root:root .pill.st-live{background:#0e9f78;color:#fff}
-:root:root:root .pill.st-lobby{background:#d9650b;color:#fff}
-:root:root:root .pill.st-open{background:#4f46e5;color:#fff}
-
-/* học sinh: ô nhập mã là thẻ màu đặc */
-.card.jn{background:var(--pri);border:0;color:#fff}
-.jn b{color:#fff}.jn .hint{color:rgba(255,255,255,.82)}
-.jn .ic{background:rgba(255,255,255,.2);box-shadow:none}
-.jn .btn.pri{background:#fff;color:var(--pri-d);box-shadow:0 4px 0 rgba(0,0,0,.22)}
-.jn .btn.pri:hover{background:#f3f4ff;color:var(--pri-d)}
-
-/* màn đăng nhập / chờ / kết quả: nền navy, thẻ trắng nổi lên */
-body:has(#app:not(.shellapp):not(.exam)){background:#12172b}
-.hero{padding:60px 32px;border:0}
-.hero h1{font-size:36px;font-weight:700;letter-spacing:-.03em}
-.hero .logo.big{border-radius:26px;width:80px;height:80px}
-
-/* màn thi: câu hỏi to, rõ; ô chữ cái vuông bo */
-.qb p{font-size:17px;line-height:1.6}
-.L{border-radius:10px;width:30px;height:30px}
-.opt{border-width:2px}.opt.sel{background:var(--tint)}
-.exam .top b{font-weight:700}
-th{color:var(--ink)}
-</style>
-<script id="skin-nav">
-/* ĐIỀU HƯỚNG MƯỢT: không nháy skeleton, không vẽ trùng, bỏ kết quả "đến muộn" khi bấm qua lại nhanh */
-(()=>{
-const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
-const IDS=()=>VIEW=="t"?["overview","library","import","challenges"]:["overview"];
-const RT_={teacher:"overview",home:"overview",lib:"library",testv:"library",chl:"challenges",runv:"challenges",attv:"challenges",imp:"import",aud:"library",qed:"library"};
-let INF=null,NT=0,SKT=0;
-Object.keys(RT_).forEach(n=>{const o=window[n];if(typeof o!="function")return;
- window[n]=function(...a){const t=++NT;INF={a:RT_[n],t,ts:Date.now()};const done=()=>{if(INF&&INF.t===t)INF=null};let r;
-  try{r=o.apply(this,a)}catch(e){done();throw e}
-  return r&&r.then?r.finally(done):(done(),r)}});
-const _page=page;
-function go(active,inner,sk){const m0=document.querySelector(".mn"),same=m0&&m0._a===active&&!m0._sk;
- _page(active,inner);const mn=document.querySelector(".mn");if(!mn)return;
- mn.classList.remove("enter");mn._h=inner;mn._a=active;
- const was=m0&&m0._sk;mn._sk=sk;
- if(RM||!mn.animate||(same&&!was))return;
- mn.getAnimations().forEach(x=>x.cancel());
- mn.animate([{opacity:0,transform:"translateY(6px)"},{opacity:1,transform:"none"}],{duration:sk?160:200,easing:"cubic-bezier(.2,.8,.2,1)"})}
-page=function(active,inner){clearTimeout(SKT);SKT=0;const sk=inner.indexOf('class="sk"')>-1;
- if(!sk&&INF&&INF.a!==active&&Date.now()-INF.ts<15000)return;
- const mn=document.querySelector(".mn"),shell=mn&&A.classList.contains("shellapp")&&A.querySelector(".side")&&A.dataset.v==VIEW;
- if(shell){
-  if(sk){document.querySelectorAll(".side nav .ni").forEach((b,i)=>b.classList.toggle("on",IDS()[i]==active));
-   SKT=setTimeout(()=>{SKT=0;go(active,inner,true)},180);return}
-  if(mn._h===inner&&mn._a===active){clearInterval(poll);mclose();return}}
- go(active,inner,sk)};
 })();
 </script>
