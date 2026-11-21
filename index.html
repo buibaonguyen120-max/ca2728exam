@@ -584,7 +584,7 @@ function rtxt(q,r){if(!r)return"–";if(r.text!=null)return r.text;if(r.choices)
 
 boot();
 </script></body></html>
-<!-- ===== SKIN V3: dán nguyên khối này ngay trước </body> trong index.html ===== -->
+<!-- ===== SKIN FINAL (v3 + v4): dán MỘT LẦN, ngay trước </body> ===== -->
 <style id="skin-v3">
 :root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.4,.64,1);--sh:0 1px 1px rgba(60,35,48,.04),0 2px 6px rgba(60,35,48,.04),0 14px 34px -8px rgba(60,35,48,.13)}
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
@@ -669,3 +669,69 @@ let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;
  document.querySelectorAll(".hero h2").forEach(h=>h.closest(".hero").classList.toggle("wait",/Waiting|Submitting/.test(h.textContent)))})}).observe(A,{childList:true,subtree:true});
 })();
 </script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style id="skin-v4">
+/* màu: nền xanh xám, thẻ trắng có viền rõ, chữ navy đậm */
+:root{--bg:#eceff6;--card:#fff;--ink:#12172b;--mut:#596280;--line:#d9dfec;--pri:#4f46e5;--pri2:#6a61f4;--pri-d:#352ea8;--tint:#e7e6fd;--sh:0 1px 0 rgba(18,23,43,.05),0 12px 28px -14px rgba(18,23,43,.25)}
+body[data-role=s]{--pri:#0e9f78;--pri2:#25bf93;--pri-d:#0a7357;--tint:#d9f4ea}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1020;--card:#161b33;--ink:#eef0fb;--mut:#9aa2c4;--line:#262d4d;--tint:#232a55}}
+:root[data-theme=dark]{--bg:#0d1020;--card:#161b33;--ink:#eef0fb;--mut:#9aa2c4;--line:#262d4d;--tint:#232a55}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif}
+body::after{display:none}
+.hint{font-size:13px}.pill{font-size:12px}
+.btn{font-weight:600}
+
+/* chữ: tiêu đề lớn, đậm; bỏ nhãn IN HOA */
+.hd h1{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.hd2 h2{font-size:19px;font-weight:700}
+.eyebrow{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--mut)}
+.mono{font-weight:600;letter-spacing:.1em;color:var(--ink)}
+
+/* thanh bên tối: tách hẳn khỏi nội dung */
+.side{background:#12172b;border-right:0}
+.sbt b,.who b{color:#fff}.sbt small,.who small{color:#8d95b5}
+.sbh,.sbu{border-color:rgba(255,255,255,.1)}
+.ni{color:#aab1cf}.ni:hover{background:rgba(255,255,255,.08);color:#fff}
+.ni.on{background:var(--pri);color:#fff}.ni.on::before{display:none}
+.av{background:rgba(255,255,255,.14);color:#fff}
+.col{background:var(--card);color:var(--ink)}
+
+/* 3 ô số: khối màu đặc, chữ trắng, là điểm nhấn duy nhất của trang */
+:root:root:root .stat{color:#fff;box-shadow:none;min-height:156px}
+:root:root:root .s1{background:#0e9f78;color:#fff}
+:root:root:root .s2{background:#d9650b;color:#fff}
+:root:root:root .s3{background:#4f46e5;color:#fff}
+:root:root:root .s4{background:#12172b;color:#fff}
+:root:root:root .stat i{background:rgba(255,255,255,.2);color:#fff}
+:root:root:root .stat em{background:rgba(255,255,255,.2);color:#fff}
+.stat b{font-size:46px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+
+/* thẻ lượt thi: vạch màu bên trái = trạng thái */
+.rcard{border-left:5px solid var(--line);padding:16px 18px}
+.rcard:has(.st-live){border-left-color:#0e9f78}.rcard:has(.st-lobby){border-left-color:#d9650b}
+.rcard:has(.st-open){border-left-color:#4f46e5}
+.rcard b:not(.mono){font-weight:600;font-size:15px}
+:root:root:root .pill.st-live{background:#0e9f78;color:#fff}
+:root:root:root .pill.st-lobby{background:#d9650b;color:#fff}
+:root:root:root .pill.st-open{background:#4f46e5;color:#fff}
+
+/* học sinh: ô nhập mã là thẻ màu đặc */
+.card.jn{background:var(--pri);border:0;color:#fff}
+.jn b{color:#fff}.jn .hint{color:rgba(255,255,255,.82)}
+.jn .ic{background:rgba(255,255,255,.2);box-shadow:none}
+.jn .btn.pri{background:#fff;color:var(--pri-d);box-shadow:0 4px 0 rgba(0,0,0,.22)}
+.jn .btn.pri:hover{background:#f3f4ff;color:var(--pri-d)}
+
+/* màn đăng nhập / chờ / kết quả: nền navy, thẻ trắng nổi lên */
+body:has(#app:not(.shellapp):not(.exam)){background:#12172b}
+.hero{padding:60px 32px;border:0}
+.hero h1{font-size:36px;font-weight:700;letter-spacing:-.03em}
+.hero .logo.big{border-radius:26px;width:80px;height:80px}
+
+/* màn thi: câu hỏi to, rõ; ô chữ cái vuông bo */
+.qb p{font-size:17px;line-height:1.6}
+.L{border-radius:10px;width:30px;height:30px}
+.opt{border-width:2px}.opt.sel{background:var(--tint)}
+.exam .top b{font-weight:700}
+th{color:var(--ink)}
+</style>
