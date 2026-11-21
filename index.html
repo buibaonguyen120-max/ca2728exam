@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8"> <link rel="preconnect" href="https://okptwwymlluhcowtdjbv.supabase.co" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Exam practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -584,68 +584,43 @@ function rtxt(q,r){if(!r)return"–";if(r.text!=null)return r.text;if(r.choices)
 
 boot();
 </script></body></html>
-<<!-- ===== SKIN V3: dán nguyên khối này ngay trước </body> trong index.html ===== -->
-<style id="skin-v3">
-:root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.4,.64,1);--sh:0 1px 1px rgba(60,35,48,.04),0 2px 6px rgba(60,35,48,.04),0 14px 34px -8px rgba(60,35,48,.13)}
+<!-- ===== MOTION PACK: giữ NGUYÊN giao diện cũ (hồng/kem, Lexend), chỉ thêm chuyển động mượt + giảm trễ. Dán MỘT LẦN trước </body> ===== -->
+<style id="motion-css">
+:root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.4,.64,1)}
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
-body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(900px 420px at 88% -8%,color-mix(in srgb,var(--pri) 11%,transparent),transparent 70%),radial-gradient(700px 380px at -6% 105%,color-mix(in srgb,var(--pri2) 9%,transparent),transparent 70%)}
-#app.shellapp{background:transparent}
-h1,h2,h3{text-wrap:balance;letter-spacing:-.015em}p{text-wrap:pretty}
-.pp,.qp,.pop,.mbox,#rtab{overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-
-/* chuyển động: gọn, đúng thuộc tính, không transition "all" */
-.btn{transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .14s var(--ease)}
-.opt{transition:border-color .18s,background-color .18s,box-shadow .18s,transform .14s var(--ease)}
-.row,.rcard,.stat,.card,.chip,.tab,.ni,.tok,.g,.dot{transition-property:background-color,border-color,color,box-shadow,transform,opacity;transition-duration:.18s}
-.mn.enter{animation:mnin .3s var(--ease) both}
-.mn.enter .row,.mn.enter .rcard,.mn.enter .card{animation:none!important}
-.mn.enter .stat{animation:mnin .55s var(--ease) both!important}
-.mn.enter .stat:nth-child(2){animation-delay:.07s!important}.mn.enter .stat:nth-child(3){animation-delay:.14s!important}
-@keyframes mnin{from{opacity:0;transform:translateY(10px)}}
-@media(hover:hover){.rcard:hover,.card.jn:hover{transform:translateY(-2px)}}
-@media(hover:none){.btn:not(.pri):hover{background:var(--card);color:inherit;border-color:var(--line)}.opt:not(.sel):hover{border-color:var(--line)}.row:hover,.tok:hover{background:transparent}.rcard:hover{transform:none;border-color:var(--line)}}
-:focus-visible{outline:2.5px solid var(--pri2);outline-offset:2px}
-
-/* màn thi */
-.exam .top{background:var(--card);border-bottom:1px solid var(--line)}
-.prog{height:6px}.prog i{border-radius:0 6px 6px 0;transition:width .55s var(--ease)}
-.pass #ps p{font-family:Newsreader,Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.85;max-width:68ch}
-.qs .card{content-visibility:auto;contain-intrinsic-size:auto 240px}
-.opt{padding:13px 16px;min-height:52px}.opt:active{transform:scale(.985)}
-.opt.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 16%,transparent)}
-.L{transition:background-color .18s,color .18s,transform .3s var(--spring)}.sel .L{transform:scale(1.1)}
-.fresh .opt.sel .L{animation:pop .34s var(--spring)}@keyframes pop{from{transform:scale(.7)}}
-.clock{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent)}
+.pp,.qp,.pop,.mbox,#rtab{overscroll-behavior:contain}
+/* transition đúng thuộc tính, không dùng "all" */
+.btn{transition:background-color .16s,border-color .16s,color .16s,box-shadow .16s,transform .12s var(--ease)}
+.opt{transition:border-color .16s,background-color .16s,transform .12s var(--ease)}.opt:active{transform:scale(.985)}
+.row,.rcard,.stat,.card,.chip,.tab,.ni,.tok,.g,.dot{transition-property:background-color,border-color,color,box-shadow,transform,opacity;transition-duration:.16s}
+/* hiệu ứng vào trang do script bên dưới điều khiển */
+.mn.enter,.mn.enter .row,.mn.enter .rcard,.mn.enter .stat,.mn.enter .card{animation:none!important}
+@media(hover:none){.btn:not(.pri):not(.on):hover{background:var(--card);color:inherit;border-color:var(--line)}.opt:not(.sel):hover{border-color:var(--line)}.row:hover,.tok:hover{background:transparent}.rcard:hover{transform:none;border-color:var(--line)}}
+:focus-visible{outline:2px solid var(--pri2);outline-offset:2px}
+.fresh .opt.sel .L{animation:pop .3s var(--spring)}@keyframes pop{from{transform:scale(.7)}}
 .clock.low{animation:tk 1s ease-in-out infinite}@keyframes tk{50%{opacity:.55}}
-.bar{box-shadow:var(--sh);padding-bottom:7px}.bar .btn{min-height:40px}
-.g{transition:background-color .18s,transform .14s}.g:active{transform:scale(.92)}
-
-/* thanh bên + thẻ */
-.ni{position:relative}.ni.on::before{content:"";position:absolute;left:-14px;top:24%;bottom:24%;width:4px;border-radius:0 4px 4px 0;background:var(--pri)}
-@media(max-width:860px){.ni.on::before{display:none}}
-.hero{border-radius:32px}.hero.wait .logo.big{animation:br 2.4s ease-in-out infinite}@keyframes br{50%{transform:scale(1.07)}}
-.ring{filter:drop-shadow(0 8px 14px color-mix(in srgb,var(--pri) 24%,transparent))}
-
-/* hộp thoại: bỏ blur nặng, bottom-sheet trên điện thoại */
-.modal{backdrop-filter:none;background:rgba(24,16,20,.55);animation:fadein .18s ease both}
-.mbox{animation:sheet .3s var(--ease) both}@keyframes sheet{from{opacity:0;transform:translateY(16px) scale(.98)}}
-#veil{backdrop-filter:none;background:rgba(20,14,17,.92)}
-@media(max-width:600px){.modal{align-items:end;padding:0}.mbox{max-width:none;border-radius:26px 26px 0 0;padding-bottom:calc(22px + env(safe-area-inset-bottom));animation-name:sheetup}@keyframes sheetup{from{transform:translateY(100%)}}}
+/* hộp thoại: bỏ blur nặng gây lag */
+.modal{backdrop-filter:none;background:rgba(30,22,26,.6);animation:fadein .16s ease both}
+.mbox{animation:sheet .26s var(--ease) both}@keyframes sheet{from{opacity:0;transform:translateY(14px) scale(.98)}}
+#veil{backdrop-filter:none;background:rgba(30,22,26,.94)}
+.hero.wait .logo.big{animation:br 2.4s ease-in-out infinite}@keyframes br{50%{transform:scale(1.07)}}
+/* thanh bên: khối nền trượt sang mục đang chọn */
+.side nav{position:relative}.ni{z-index:1}
+.navpill{position:absolute;left:0;top:0;border-radius:16px;background:var(--tint);z-index:0;pointer-events:none;transition:transform .3s var(--ease),width .3s var(--ease),height .3s,opacity .2s}
+.ni.on,.ni.on:hover{background:transparent}
 </style>
-<script id="skin-v3-js">
+<script id="motion-js">
 (()=>{
-const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
-const lk=document.createElement("link");lk.rel="stylesheet";lk.href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500&display=swap";document.head.appendChild(lk);
-const fx=(el,kf,o)=>{if(RM||!el||!el.animate)return;el.animate(kf,Object.assign({duration:280,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"},o||{}))};
+const RM=matchMedia("(prefers-reduced-motion:reduce)").matches,ease="cubic-bezier(.2,.8,.2,1)";
+const fx=(el,kf,o)=>{if(RM||!el||!el.animate)return;el.animate(kf,Object.assign({duration:170,easing:ease,fill:"backwards"},o||{}))};
 
-// 1) Qua trang / mở bảng: trượt mượt theo hướng Next/Previous
+/* 1) Màn thi: Next/Previous trượt nhẹ theo hướng, mở bảng chọn có hiệu ứng */
 const _d=draw;draw=function(){const pv=R&&R.lp,pp=(R&&R._pp)||"";_d.apply(this,arguments);if(!R||!R.pg)return;
- if(pv!=null&&pv!==R.p){const d=R.p>pv?1:-1;document.querySelectorAll(".qp,.pp,.ins").forEach(e=>fx(e,[{opacity:0,transform:`translateX(${d*26}px)`},{opacity:1,transform:"none"}]))}
- if(!pp&&R.pop)fx($(".pop"),[{opacity:0,transform:"translateY(8px) scale(.96)"},{opacity:1,transform:"none"}],{duration:200});
+ if(pv!=null&&pv!==R.p){const d=R.p>pv?1:-1;document.querySelectorAll(".qp,.pp,.ins").forEach(e=>fx(e,[{opacity:.25,transform:`translateX(${d*14}px)`},{opacity:1,transform:"none"}]))}
+ if(!pp&&R.pop)fx($(".pop"),[{opacity:0,transform:"translateY(8px) scale(.96)"},{opacity:1,transform:"none"}],{duration:180});
  R._pp=R.pop||""};
 
-// 2) Chọn đáp án: chỉ vẽ lại ĐÚNG câu vừa bấm (không vẽ lại cả trang) -> hết giật
+/* 2) Chọn đáp án: chỉ vẽ lại ĐÚNG câu vừa bấm -> phản hồi tức thì, không giật */
 const _c=card;card=function(q){return _c(q).replace('<div class="card">','<div class="card" data-q="'+q.id+'">')};
 const _p=put;put=function(id,r,re){if(R)R._l=id;if(re&&navigator.vibrate&&!RM)navigator.vibrate(6);return _p.apply(this,arguments)};
 const _rq=redrawQ;
@@ -656,16 +631,54 @@ redrawQ=function(){const id=R&&R._l;if(R)R._l=null;const qs=$(".qs"),q=id&&R.Q&&
  const gb=document.querySelector('.bar button[onclick="tp(\'grid\')"]');if(gb)gb.textContent="▦ "+nd+"/"+R.Q.length+" done";
  if(R.pop=="grid"){const p=$(".pop");if(p)p.outerHTML=pop()}noassist()};
 
-// 3) Bảng kết quả của giáo viên: chỉ vẽ lại khi dữ liệu thật sự đổi (poll 4s hết nháy)
+/* 3) Bảng kết quả giáo viên: chỉ vẽ lại khi dữ liệu thật sự đổi (hết nháy mỗi 4s) */
 const _rd=rdraw;rdraw=function(){const t=$("#rtab");if(!RD||!t)return _rd();const{r,at,rk,an}=RD,now=Date.now();
  const s=[RT,r.status,r.time_limit_min,at.map(x=>[x.id,x.status,x.current_position,x.points_earned,x.counted,x.submitted_at,!!(x.last_seen_at&&now-new Date(x.last_seen_at)<20000)].join()).join(";"),rk.length,an.length,an.reduce((m,x)=>m+(+x.points||0),0)].join("|");
  if(t.dataset.s===s){rmod();return}_rd();const t2=$("#rtab");if(t2)t2.dataset.s=s};
 
-// 4) Vòng điểm chạy từ 0, màn chờ "thở"
+/* 4) Vòng điểm chạy từ 0, màn chờ "thở" */
 const ring=r=>{r.dataset.d=1;const to=parseFloat(r.style.getPropertyValue("--p"))||0,b=r.querySelector("b");if(RM||!b)return;const t0=performance.now();
- (function f(t){const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3);r.style.setProperty("--p",to*e);b.textContent=Math.round(to*e)+"%";if(k<1)requestAnimationFrame(f)})(t0)};
+ (function f(t){const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);r.style.setProperty("--p",to*e);b.textContent=Math.round(to*e)+"%";if(k<1)requestAnimationFrame(f)})(t0)};
 let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;
  document.querySelectorAll(".ring:not([data-d])").forEach(ring);
  document.querySelectorAll(".hero h2").forEach(h=>h.closest(".hero").classList.toggle("wait",/Waiting|Submitting/.test(h.textContent)))})}).observe(A,{childList:true,subtree:true});
+
+/* 5) Điều hướng: không nháy skeleton, không vẽ trùng, bỏ kết quả "đến muộn" khi bấm qua lại nhanh */
+const IDS=()=>VIEW=="t"?["overview","library","import","challenges"]:["overview"];
+const RT_={teacher:"overview",home:"overview",lib:"library",testv:"library",chl:"challenges",runv:"challenges",attv:"challenges",imp:"import",aud:"library",qed:"library"};
+let INF=null,NT=0,SKT=0;
+Object.keys(RT_).forEach(n=>{const o=window[n];if(typeof o!="function")return;
+ window[n]=function(...a){const t=++NT;INF={a:RT_[n],t,ts:Date.now()};const done=()=>{if(INF&&INF.t===t)INF=null};let r;
+  try{r=o.apply(this,a)}catch(e){done();throw e}
+  return r&&r.then?r.finally(done):(done(),r)}});
+const _page=page;
+const place=instant=>{const nav=document.querySelector(".side nav");if(!nav)return;const b=nav.querySelector(".ni.on");let p=nav.querySelector(".navpill");
+ if(!p){p=document.createElement("i");p.className="navpill";nav.prepend(p);instant=true}
+ if(!b){p.style.opacity=0;return}
+ p.style.opacity=1;if(instant)p.style.transition="none";
+ p.style.width=getComputedStyle(nav).display=="grid"?"100%":b.offsetWidth+"px";p.style.height=b.offsetHeight+"px";p.style.transform="translate("+b.offsetLeft+"px,"+b.offsetTop+"px)";
+ if(instant){void p.offsetWidth;p.style.transition=""}};
+addEventListener("resize",()=>place(true));
+const _sb=sbtog;sbtog=function(){_sb();setTimeout(()=>place(true),320)};
+function count(el){const m=/^(\d+)(%?)$/.exec(el.textContent.trim());if(!m)return;const to=+m[1],t0=performance.now();
+ (function f(t){if(!el.isConnected)return;const k=Math.min(1,(t-t0)/500),e=1-Math.pow(1-k,3);el.textContent=Math.round(to*e)+m[2];if(k<1)requestAnimationFrame(f)})(t0)}
+function go(active,inner,sk){const m0=document.querySelector(".mn"),same=m0&&m0._a===active&&!m0._sk;
+ _page(active,inner);const mn=document.querySelector(".mn");if(!mn)return;
+ mn.classList.remove("enter");mn._h=inner;mn._a=active;
+ const was=m0&&m0._sk;mn._sk=sk;place(false);
+ if(RM||!mn.animate||(same&&!was))return;
+ mn.getAnimations().forEach(x=>x.cancel());
+ if(sk){mn.animate([{opacity:0},{opacity:1}],{duration:140,easing:ease});return}
+ const els=[...mn.querySelectorAll(":scope > .hd, :scope > .hd2, :scope > .tabs, :scope > .card, :scope > .stats > .stat, :scope > .grid > .rcard")].slice(0,8);
+ if(!els.length)mn.animate([{opacity:0,transform:"translateY(6px)"},{opacity:1,transform:"none"}],{duration:180,easing:ease});
+ els.forEach((e,i)=>e.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:260,delay:i*28,easing:ease,fill:"backwards"}));
+ mn.querySelectorAll(".stat b").forEach(count)}
+page=function(active,inner){clearTimeout(SKT);SKT=0;const sk=inner.indexOf('class="sk"')>-1;
+ if(!sk&&INF&&INF.a!==active&&Date.now()-INF.ts<15000)return;
+ const mn=document.querySelector(".mn"),shell=mn&&A.classList.contains("shellapp")&&A.querySelector(".side")&&A.dataset.v==VIEW;
+ if(shell){
+  if(sk){document.querySelectorAll(".side nav .ni").forEach((b,i)=>b.classList.toggle("on",IDS()[i]==active));place(false);SKT=setTimeout(()=>{SKT=0;go(active,inner,true)},180);return}
+  if(mn._h===inner&&mn._a===active){clearInterval(poll);mclose();return}}
+ go(active,inner,sk)};
 })();
 </script>
