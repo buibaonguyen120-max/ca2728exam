@@ -254,16 +254,21 @@ function card(q){const a=R.ans[q.id]||{},c=q.content||{},t=q.type,id=q.id;let b=
  if(t=="tfng")b=`<p>${fm(c.statement)}</p>`+["TRUE","FALSE","NOT_GIVEN"].map(o=>`<button class="opt tf ${a.choice==o?"sel":""}" onclick="put('${id}',{choice:'${o}'},1)">${o.replace("_"," ")}</button>`).join("");
  if(t=="gap_fill")b=String(c.text||"").split(/___(\d+)___/).map((x,j)=>j%2?`<input type="text" size="9" ${inp} value="${esc((a.blanks||{})[x]||"")}" oninput="gap('${id}','${x}',this.value)">`:fm(x)).join("");
  if(t=="word_formation"){const bank=c.bank||(q.section&&q.section.word_bank)||[];b=`<p>${fm(c.text)}</p><select onchange="wf('${id}','base',this.value)"><option value="">Base word…</option>${bank.map(w=>`<option ${a.base==w?"selected":""}>${esc(w)}</option>`).join("")}</select> <input type="text" placeholder="your form" ${inp} value="${esc(a.form||"")}" oninput="wf('${id}','form',this.value)">`}
- if(t=="error_id"){const tk=String(c.text||"").split(/\s+/),on=(a.marks||[]).flatMap(m=>m.tokens);b=`<p class="hint">Click the wrong word(s); a mistake can be more than one word.</p><p>${tk.map((w,i)=>`<span class="tok ${on.includes(i)?"on":""}" onclick="errTok('${id}',${i})">${esc(w)}</span>`).join(" ")}</p>`+(a.marks||[]).map((m,j)=>`<div>${j+1}. <s>${m.tokens.map(i=>esc(tk[i])).join(" ")}</s> → <input type="text" ${inp} value="${esc(m.correction)}" oninput="errCorr('${id}',${j},this.value)"></div>`).join("")}
+ if(t=="error_id"){const tk=String(c.text||"").split(/\s+/),ms=a.marks||[],N=parseInt(c.count)||0,on={};ms.forEach((m,j)=>m.tokens.forEach(i=>on[i]=j+1));const full=N&&ms.length>=N,rows=Math.max(N,ms.length);b=`<p class="hint">Click the word${N>1?"s":""} you think are wrong. ${N?`There ${N>1?"are":"is"} exactly ${N} mistake${N>1?"s":""}: <b>${ms.length}/${N}</b> marked.`:"A mistake can be more than one word."} Click a marked word again to clear it.</p><p class="etx">${tk.map((w,i)=>`<span class="tok ${on[i]?"on":""} ${full&&!on[i]?"lock":""}" onclick="errTok('${id}',${i})">${esc(w)}${on[i]?`<sup>${on[i]}</sup>`:""}</span>`).join(" ")}</p><div class="esl">${Array.from({length:rows},(_,j)=>{const m=ms[j];return m?`<div class="es on"><span class="n">${j+1}</span><s>${m.tokens.map(i=>esc(tk[i])).join(" ")}</s><span>→</span><input type="text" ${inp} placeholder="correction" value="${esc(m.correction)}" oninput="errCorr('${id}',${j},this.value)"><button class="x" onclick="errClr('${id}',${j})" aria-label="Clear">✕</button></div>`:`<div class="es"><span class="n">${j+1}</span><span class="hint">Click a word in the sentence</span></div>`}).join("")}</div>`}
  if(t=="essay"||t=="sentence_transformation")b=`<p>${fm(c.prompt||c.text||"")}</p><textarea rows="${t=="essay"?6:3}" style="width:100%" ${inp} oninput="put('${id}',{text:this.value},0)">${esc(a.text||"")}</textarea>`;
- if(t=="paragraph_gap"){const ps=c.paragraphs||[],sl=a.slots||{},used={};Object.entries(sl).forEach(([n,v])=>{if(v)used[v]=n});b=`<div class="pg">${String(c.text||"").split(/\[(\d+)\]/).map((x,j)=>j%2?`<select class="gsel ${sl[x]?"on":""}" onchange="slot('${id}','${x}',this.value)"><option value="">Gap ${esc(x)}</option>${ps.map(p=>`<option value="${esc(p.key)}" ${sl[x]==p.key?"selected":""}>${esc(p.key)}</option>`).join("")}</select>`:fm(x)).join("")}</div><div class="hint" style="margin:14px 0 6px">Paragraphs to place</div>${ps.map(p=>`<div class="pgp ${used[p.key]?"used":""}"><b>${esc(p.key)}</b><span>${fm(p.text)}</span>${used[p.key]?`<em>gap ${esc(used[p.key])}</em>`:""}</div>`).join("")}`}
+ if(t=="paragraph_gap"){const ps=c.paragraphs||[],sl=a.slots||{},pm={};ps.forEach(p=>pm[p.key]=p);const used=new Set(Object.values(sl).filter(Boolean));b=`<p class="hint">Drag each paragraph into a gap, or tap a paragraph and then tap a gap. Drag a placed paragraph to move it or back to the list.</p><div class="pg" data-q="${id}">${String(c.text||"").split(/\[(\d+)\]/).map((x,j)=>{if(j%2==0)return x.trim()?`<div class="pgt">${fm(x.replace(/^\s+|\s+$/g,""))}</div>`:"";const k=sl[x],p=k&&pm[k];return`<div class="gapb ${p?"fill":""}" data-gap="${esc(x)}">${p?`<div class="gpc" data-pk="${esc(k)}" data-from="${esc(x)}"><i class="gh">⠿</i><b>${esc(k)}</b><span>${fm(p.text)}</span><button class="x" onclick="slot('${id}','${esc(x)}','')" aria-label="Remove">✕</button></div>`:`<span class="gl">Gap ${esc(x)}</span>`}</div>`}).join("")}</div><div class="hint" style="margin:14px 0 6px">Paragraphs</div><div class="pgbank" data-q="${id}">${ps.filter(p=>!used.has(p.key)).map(p=>`<div class="pgp" data-pk="${esc(p.key)}"><i class="gh">⠿</i><b>${esc(p.key)}</b><span>${fm(p.text)}</span></div>`).join("")||'<span class="hint">All paragraphs are placed.</span>'}</div>`}
  if(t=="matching"){const its=c.items||[],ops=c.options||[],sl=a.slots||{};b=(c.prompt?`<p>${fm(c.prompt)}</p>`:"")+`<div class="mop">${ops.map(o=>`<div><b>${esc(o.key)}</b><span>${fm(o.text)}</span></div>`).join("")}</div>`+its.map(it=>`<div class="mit"><span class="n">${esc(it.n)}</span><span class="grow">${fm(it.text)}</span><select class="gsel ${sl[it.n]?"on":""}" onchange="slot('${id}','${it.n}',this.value)"><option value="">Choose…</option>${ops.map(o=>`<option value="${esc(o.key)}" ${sl[it.n]==o.key?"selected":""}>${esc(o.key)}</option>`).join("")}</select></div>`).join("")}
  return`<div class="card"><div class="qh"><span class="pill ${SKC[q.skill]||""}">${SKN[q.skill]||q.skill}</span><span class="pt">${q.points} point${q.points>1?"s":""}</span></div><div class="qn">QUESTION ${esc(q.title||nq(q))}</div><div class="qb">${b}</div></div>`}
 function pick(id,k,multi){let a=R.ans[id]||{choices:[]},c=a.choices||[];c=multi?(c.includes(k)?c.filter(x=>x!=k):[...c,k]):[k];put(id,{choices:c},1)}
 function slot(id,n,v){const a=R.ans[id]||{},sl=Object.assign({},a.slots||{});if(v)sl[n]=v;else delete sl[n];put(id,{slots:sl},1)}
 function gap(id,n,v){const a=R.ans[id]||{blanks:{}};a.blanks=a.blanks||{};a.blanks[n]=v;put(id,a,0)}
 function wf(id,k,v){const a=R.ans[id]||{};a[k]=v;put(id,a,0)}
-function errTok(id,i){const cur=R.ans[id]||{marks:[]},corr={};(cur.marks||[]).forEach(m=>corr[m.tokens[0]]=m.correction);let t=(cur.marks||[]).flatMap(m=>m.tokens);t=t.includes(i)?t.filter(x=>x!=i):[...t,i];t.sort((a,b)=>a-b);const g=[];t.forEach(x=>{const l=g[g.length-1];l&&l[l.length-1]==x-1?l.push(x):g.push([x])});put(id,{marks:g.map(a=>({tokens:a,correction:corr[a[0]]||""}))},1)}
+function errTok(id,i){const cur=R.ans[id]||{},ms=(cur.marks||[]).map(m=>({tokens:[...m.tokens],correction:m.correction||""})),q=R.Q.find(x=>x.id==id),N=parseInt((q&&q.content||{}).count)||0,k=ms.findIndex(m=>m.tokens.includes(i));
+ if(k>=0){ms.splice(k,1);return put(id,{marks:ms},1)}
+ const nb=ms.filter(m=>m.tokens.includes(i-1)||m.tokens.includes(i+1));
+ if(nb.length){const m=nb[0];m.tokens=[...m.tokens,i];nb.slice(1).forEach(o=>{m.tokens=m.tokens.concat(o.tokens);ms.splice(ms.indexOf(o),1)});m.tokens=[...new Set(m.tokens)].sort((a,b)=>a-b);return put(id,{marks:ms},1)}
+ if(N&&ms.length>=N){toast("This sentence has exactly "+N+" mistake"+(N>1?"s":"")+". Click a marked word to clear it first.",true);return}
+ ms.push({tokens:[i],correction:""});put(id,{marks:ms},1)}
 function errCorr(id,j,v){R.ans[id].marks[j].correction=v;put(id,R.ans[id],0)}
 // saving: every answer goes to the server at once; offline answers wait and retry
 function st(m){const e=$("#sv");if(e)e.textContent=m}
@@ -408,7 +413,7 @@ function qcontent(){qcollect();const d=QE.d,t=d.type;let c={},k={};
  else if(t=="tfng"){c={statement:d.prompt};k={correct:d.tf}}
  else if(t=="gap_fill"){const ns=[...new Set([...String(d.text).matchAll(/___(\d+)___/g)].map(m=>m[1]))],bl={};ns.forEach(n=>{bl[n]={accept:spl(d.blanks[n])};if(d.cs&&d.cs[n])bl[n].case_sensitive=true});c={text:d.text};if(parseInt(d.maxw))c.max_words=parseInt(d.maxw);k={blanks:bl}}
  else if(t=="word_formation"){c={text:d.text};const b=String(d.bank).split(",").map(x=>x.trim()).filter(Boolean);if(b.length)c.bank=b;k={base:String(d.base).trim(),accept:spl(d.forms)}}
- else if(t=="error_id"){c={text:String(d.text).trim()};k={errors:d.errs.filter(e=>e.t.trim()||e.a.trim()).map(e=>({tokens:e.t.split(",").map(x=>parseInt(x)).filter(x=>!isNaN(x)).sort((a,b)=>a-b),accept:spl(e.a)}))}}
+ else if(t=="error_id"){c={text:String(d.text).trim()};k={errors:d.errs.filter(e=>e.t.trim()||e.a.trim()).map(e=>({tokens:e.t.split(",").map(x=>parseInt(x)).filter(x=>!isNaN(x)).sort((a,b)=>a-b),accept:spl(e.a)}))};c.count=k.errors.length}
  else if(t=="paragraph_gap"){const ns=[...new Set([...String(d.text).matchAll(/\[(\d+)\]/g)].map(m=>m[1]))];c={text:d.text,paragraphs:d.pgs.map((p,i)=>({key:LET(i),text:p.text.trim()}))};k={slots:Object.fromEntries(ns.filter(n=>d.pslots[n]).map(n=>[n,d.pslots[n]]))}}
  else if(t=="matching"){c={items:d.items.map(it=>({n:String(it.n),text:it.text.trim()})),options:d.mopts.map((o,i)=>({key:LET(i),text:o.text.trim()}))};if(String(d.prompt).trim())c.prompt=d.prompt;k={slots:Object.fromEntries(d.items.filter(it=>it.ans).map(it=>[String(it.n),it.ans]))}}
  else{c={prompt:d.prompt};if(t=="essay"&&parseInt(d.minw))c.min_words=parseInt(d.minw);k=String(d.sample).trim()?{sample:String(d.sample).trim()}:{}}
@@ -484,7 +489,7 @@ function impFile(inp){const f=inp.files[0];if(f)impRead(f)}
 function impRead(f){if(!f)return;if(!/\.json$/i.test(f.name)&&f.type!=="application/json"){impErr("Please choose a .json file.");return}
  f.text().then(t=>{try{EX=JSON.parse(t)}catch(e){impErr("This file is not valid JSON.");return}
  if(!EX||typeof EX!=="object"){impErr("This file is not a valid exam.");return}
- const qs=[];(EX.parts||[]).forEach(p=>(p.sections||[]).forEach(s=>(s.questions||[]).forEach(q=>qs.push(q))));const pts=qs.reduce((a,q)=>a+(+q.points||0),0),nk=qs.filter(q=>!q.key).map(q=>q.title),kb=f.size<1024?f.size+" B":(f.size/1024).toFixed(1)+" KB";
+ const qs=[];(EX.parts||[]).forEach(p=>(p.sections||[]).forEach(s=>(s.questions||[]).forEach(q=>qs.push(q))));qs.forEach(q=>{if(q.type=="error_id"&&q.key&&Array.isArray(q.key.errors)){q.content=q.content||{};if(q.content.count==null)q.content.count=q.key.errors.length}});const pts=qs.reduce((a,q)=>a+(+q.points||0),0),nk=qs.filter(q=>!q.key).map(q=>q.title),kb=f.size<1024?f.size+" B":(f.size/1024).toFixed(1)+" KB";
  const z=$("#dz");if(z){z.classList.add("done");$("#dzt").textContent="File loaded. Drop another to replace it";$("#dzs").textContent=f.name}
  $("#imp").innerHTML=`<div class="card impr"><small class="eyebrow">STEP 2 · REVIEW</small><div class="ifile"><span class="fi">${IMP_FILE}</span><div class="grow"><b>${esc(EX.title||"Untitled exam")}</b><small class="hint">${esc(f.name)} · ${kb}</small></div></div><div class="istats"><div><b>${qs.length}</b><small>Questions</small></div><div><b>${pts}</b><small>Points</small></div><div><b>${(EX.parts||[]).length}</b><small>Parts</small></div></div>${!qs.length?'<p class="iwarn">No questions were found in this file.</p>':""}${nk.length?`<div class="iwarn"><b>Missing answer keys</b><span>${esc(nk.join(", "))}</span></div>`:(qs.length?'<p class="iok">✓ Every question has an answer key</p>':"")}<div class="iact"><label class="tlf"><span>Time limit</span><input type="text" id="tl" size="4" inputmode="numeric" value="${esc(EX.time_limit_min||"")}"><em>minutes · leave blank for no limit</em></label><button class="btn pri" id="igo" ${nk.length||!qs.length?"disabled":""} onclick="impGo()">Import exam</button></div></div>`})}
 async function impGo(){const g=$("#igo");if(g){g.disabled=true;g.textContent="Importing…"}
@@ -977,6 +982,54 @@ function attInfo(Q,aid,rid,idx){const me=[{id:aid}],o=agg(Q,me,idx),p=pc(o.got,o
   const rows=g.map(([k,qs])=>{const a1=agg(qs,me,idx),pp=pc(a1.got,a1.pts),cc=cl.length?agg(qs,cl,cidx):null,cp=cc?pc(cc.got,cc.pts):null;return`<div class="atc"><span>${esc(glab(d,k))}<small class="hint"> ${a1.full}/${qs.length} correct</small></span>${sbar(a1)}${pill(pp)}${cl.length?`<span class="hint" title="Class average">⌀ ${cp==null?"–":cp+"%"}</span>`:""}</div>`}).join("");
   return`<details class="sg"${i<2?" open":""}><summary><span class="sgn">By ${GD[d].toLowerCase()}</span><small class="hint">${g.length} group${g.length>1?"s":""}</small><span></span><span></span></summary><div class="sgb">${rows}</div></details>`}).join("");
  return`<div class="card"><b>Summary</b><div class="sst"><div><b>${o.full}</b><small>Correct</small></div><div><b>${o.part}</b><small>Partial</small></div><div><b>${o.wrong}</b><small>Wrong</small></div><div><b>${o.blank}</b><small>Blank</small></div><div><b>${o.pend}</b><small>To grade</small></div></div>${sbar(o)}<p class="hint" style="margin-bottom:0">${p==null?"No graded points yet":p+"% of "+o.pts+" graded points"}${cl.length?" · ⌀ = class average ("+cl.length+" others)":""}</p>${sleg()}${blocks}</div>`}
+</script>
+<style id="dnd-css">
+.etx{line-height:2.1}.etx .tok{position:relative}.etx .tok sup{font-size:10px;margin-left:1px;color:var(--pri);font-weight:700}
+.tok.lock{opacity:.45;cursor:not-allowed}
+.esl{display:grid;gap:8px;margin-top:12px}
+.es{display:flex;gap:10px;align-items:center;padding:8px 12px;border:1.5px dashed var(--line);border-radius:12px;background:var(--bg)}
+.es.on{border-style:solid;border-color:var(--pri);background:var(--tint)}
+.es .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--pri)}
+.es input{flex:1;min-width:0}
+.es .x,.gpc .x{border:0;background:transparent;cursor:pointer;color:var(--mut);font-size:16px;padding:2px 6px}
+.pg{line-height:1.6}
+.gapb{display:flex;align-items:center;min-height:56px;margin:10px 0;padding:10px 12px;border:2px dashed var(--line);border-radius:14px;background:var(--bg);transition:border-color .2s,background-color .2s,transform .2s}
+.gapb .gl{color:var(--mut);font-weight:600}
+.gapb.fill{border-style:solid;border-color:var(--pri);background:var(--tint)}
+.pg.armed .gapb{border-color:var(--pri)}
+.gapb.over,.pgbank.over{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 16%,transparent)}
+.gpc,.pgp[data-pk]{cursor:grab;user-select:none;-webkit-user-select:none}
+.gpc{display:flex;gap:10px;align-items:flex-start;width:100%}
+.gpc b,.pgp[data-pk] b{flex:none;min-width:22px;color:var(--pri)}
+.gpc span,.pgp[data-pk] span{flex:1}
+.gh{flex:none;padding:0 4px;color:var(--mut);font-style:normal;touch-action:none;cursor:grab;user-select:none}
+.pgbank{min-height:52px;padding:4px;border:2px dashed transparent;border-radius:14px;transition:border-color .2s,background-color .2s}
+.pgp.sel,.gpc.sel{outline:2px solid var(--pri);outline-offset:2px;border-radius:12px}
+.pgp.dragging,.gpc.dragging{opacity:.35}
+.pgghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;box-shadow:var(--sh);background:var(--card);border:1.5px solid var(--pri);border-radius:14px;padding:10px 14px;display:flex;gap:10px;opacity:.96;margin:0}
+</style>
+<script id="dnd-js">
+function errClr(id,j){const a=R.ans[id]||{},ms=(a.marks||[]).slice();ms.splice(j,1);put(id,{marks:ms},1)}
+function pgPlace(id,gap,key,from){if(from===gap)return;const a=R.ans[id]||{},sl=Object.assign({},a.slots||{}),cur=sl[gap];Object.keys(sl).forEach(n=>{if(sl[n]==key)delete sl[n]});if(cur&&from)sl[from]=cur;sl[gap]=key;PGSEL=null;put(id,{slots:sl},1)}
+function pgBack(id,key){const a=R.ans[id]||{},sl=Object.assign({},a.slots||{});Object.keys(sl).forEach(n=>{if(sl[n]==key)delete sl[n]});PGSEL=null;put(id,{slots:sl},1)}
+let PGSEL=null;
+(()=>{let D=null,sup=false;const root=e=>e.closest&&e.closest(".pg[data-q],.pgbank[data-q]");
+ const clr=()=>{document.querySelectorAll(".gapb.over,.pgbank.over").forEach(x=>x.classList.remove("over"))};
+ const target=(x,y)=>{const t=document.elementFromPoint(x,y);return t&&t.closest(".gapb,.pgbank")};
+ document.addEventListener("pointerdown",e=>{if(e.button>0)return;const el=e.target.closest(".pgp[data-pk],.gpc[data-pk]");if(!el||e.target.closest("button")||!R)return;
+  if(e.pointerType=="touch"&&!e.target.closest(".gh"))return;const r=el.closest("[data-q]");if(!r)return;const b=el.getBoundingClientRect();
+  D={el,id:r.dataset.q,key:el.dataset.pk,from:el.dataset.from||null,x:e.clientX,y:e.clientY,ox:e.clientX-b.left,oy:e.clientY-b.top,w:b.width,drag:false,g:null}});
+ document.addEventListener("pointermove",e=>{if(!D)return;if(!D.drag){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<6)return;D.drag=true;const g=D.el.cloneNode(true);g.classList.add("pgghost");g.classList.remove("sel","dragging");g.style.width=Math.min(D.w,420)+"px";document.body.appendChild(g);D.g=g;D.el.classList.add("dragging");document.querySelectorAll(".pg").forEach(p=>p.classList.add("armed"))}
+  D.g.style.transform=`translate(${e.clientX-D.ox}px,${e.clientY-D.oy}px)`;clr();const t=target(e.clientX,e.clientY);if(t)t.classList.add("over");e.preventDefault()},{passive:false});
+ const end=e=>{if(!D)return;const d=D;D=null;if(!d.drag)return;d.g.remove();d.el.classList.remove("dragging");clr();document.querySelectorAll(".pg.armed").forEach(p=>p.classList.remove("armed"));sup=true;setTimeout(()=>sup=false,0);
+  const t=target(e.clientX,e.clientY);if(!t)return;if(t.classList.contains("gapb"))pgPlace(d.id,t.dataset.gap,d.key,d.from);else if(d.from)pgBack(d.id,d.key)};
+ document.addEventListener("pointerup",end);document.addEventListener("pointercancel",e=>{if(D&&D.drag){D.g.remove();D.el.classList.remove("dragging");clr()}D=null});
+ document.addEventListener("click",e=>{if(sup){e.stopPropagation();return}const r=root(e.target);if(!r||e.target.closest("button"))return;const id=r.dataset.q;
+  const item=e.target.closest(".pgp[data-pk],.gpc[data-pk]"),gap=e.target.closest(".gapb"),bank=e.target.closest(".pgbank");
+  const arm=()=>{document.querySelectorAll(".pgp.sel,.gpc.sel").forEach(x=>x.classList.remove("sel"));document.querySelectorAll(".pg").forEach(p=>p.classList.toggle("armed",!!PGSEL));if(PGSEL&&PGSEL.el)PGSEL.el.classList.add("sel")};
+  if(PGSEL&&PGSEL.id==id){if(gap){pgPlace(id,gap.dataset.gap,PGSEL.key,PGSEL.from);return}if(bank&&PGSEL.from){pgBack(id,PGSEL.key);return}}
+  if(item){if(PGSEL&&PGSEL.el===item)PGSEL=null;else PGSEL={id,key:item.dataset.pk,from:item.dataset.from||null,el:item};arm()}});
+})();
 </script>
 <script id="delete-js">
 let DELQ=[];
