@@ -531,7 +531,7 @@ async function act2(fn,run,rec){const{error}=await SB.rpc(fn,{p_run:run,p_record
 function csv(){if(!RD)return;const{r,at,rk,an}=RD,rows=[["Student","Attempt","Counted","Status","Points","Possible","Percent","Answered","Risk","Seconds","Submitted"]].concat(at.map(a=>[a.profiles&&a.profiles.full_name||a.guest_name||"Guest",a.attempt_no,a.counted?"yes":"",a.status,a.points_earned,a.points_possible,a.points_possible?Math.round(a.points_earned/a.points_possible*100):0,an.filter(x=>x.attempt_id==a.id).length,rk.filter(x=>x.attempt_id==a.id).length,a.submitted_at?Math.round((new Date(a.submitted_at)-new Date(a.started_at))/1000):"",a.submitted_at||""])),s=rows.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n"),l=document.createElement("a");l.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));l.download=(r.snapshot.title||"results").replace(/[^\w\-]+/g,"_")+".csv";l.click()}
 // ----- Teacher: one student's attempt
 async function attv(aid,rid){clearInterval(poll);const[{data:r},{data:an},{data:rk},{data:a}]=await Promise.all([SB.from("runs").select("snapshot").eq("id",rid).single(),SB.from("answers").select("question_id,response,points,comment").eq("attempt_id",aid),SB.from("risk_events").select("kind,detail,occurred_at").eq("attempt_id",aid).order("occurred_at"),SB.from("attempts").select("points_earned,points_possible,provisional,guest_name,profiles(full_name)").eq("id",aid).single()]);const Q=r.snapshot.questions||[],idx=new Map();(an||[]).forEach(x=>idx.set(aid+"|"+x.question_id,x));
- page("challenges",`<div class="hd"><div><small class="eyebrow">STUDENT</small><h1>${esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")}</h1><span class="hint">${a.points_earned}/${a.points_possible} points${a.provisional?" · provisional":""}</span></div><span><button class="btn" onclick="runv('${rid}')">← Results</button><button class="btn" onclick="if(confirm('Move this attempt to the trash?'))trashAtt('${aid}','${rid}')">🗑 Trash</button></span></div>${attInfo(Q,aid,rid,idx)}<div class="card"><b>Risk</b>${(rk||[]).length?rk.map(x=>`<div class="hint">${new Date(x.occurred_at).toLocaleTimeString()} · ${x.kind}${x.kind=="audio_seek"&&x.detail?` (from ${fmt(x.detail.from)} to ${fmt(x.detail.to)})`:""}</div>`).join(""):'<p class="hint">No flags.</p>'}</div><div class="card" style="overflow:auto"><div class="top2"><b>Answers</b><span class="schips" id="atf">${[["all","All"],["wrong","Wrong"],["part","Partial"],["blank","Blank"],["pend","To grade"],["full","Correct"]].map(([k,l])=>`<button class="chip ${k=="all"?"on":""}" onclick="attf('${k}',this)">${l}</button>`).join("")}</span></div><table id="atq"><tr><th>#</th><th>Question</th><th>Answer</th><th>Points</th></tr>${Q.map(q=>{const x=idx.get(aid+"|"+q.id),c=q.content||{},man=MAN.includes(q.type),s=cst(q,x),kt=ktxt(q),pt=q.part&&(q.part.title||q.part.name),sc=q.section&&q.section.title;return`<tr data-st="${s}"><td>${esc(q.title)}<div class="hint">${esc(TYN[q.type]||q.type)}</div>${pt||sc?`<div class="hint">${esc([pt,sc].filter(Boolean).join(" › "))}</div>`:""}</td><td>${esc(String(c.prompt||c.text||c.statement||"").slice(0,120))}</td><td><span class="sbadge ${s}">${SBL[s]}</span><div class="t-${s}" style="margin-top:4px">${esc(x?rtxt(q,x.response):"–")}</div>${kt&&!man&&s!="full"?`<div class="hint">Key: ${esc(kt)}</div>`:""}${man&&(q.key||{}).sample?`<div class="hint">Sample: ${esc(q.key.sample)}</div>`:""}</td><td>${man?`<input type="text" size="4" id="p${q.id}" value="${x&&x.points!=null?x.points:""}"> / ${q.points}<br><input type="text" id="c${q.id}" placeholder="comment" value="${esc(x&&x.comment||"")}"><br><button class="btn pri" onclick="sg('${aid}','${q.id}')">Save</button>`:(x&&x.points!=null?x.points+" / "+q.points:"0 / "+q.points)}</td></tr>`}).join("")}</table></div>`)}
+ page("challenges",`<div class="hd"><div><small class="eyebrow">STUDENT</small><h1>${esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")}</h1><span class="hint">${a.points_earned}/${a.points_possible} points${a.provisional?" · provisional":""}</span></div><span><button class="btn" onclick="runv('${rid}')">← Results</button><button class="btn" onclick="if(confirm('Move this attempt to the trash?'))trashAtt('${aid}','${rid}')">🗑 Trash</button></span></div>${attInfo(Q,aid,rid,idx)}<div class="card"><b>Risk</b>${(rk||[]).length?rk.map(x=>`<div class="hint">${new Date(x.occurred_at).toLocaleTimeString()} · ${x.kind}${x.kind=="audio_seek"&&x.detail?` (from ${fmt(x.detail.from)} to ${fmt(x.detail.to)})`:""}</div>`).join(""):'<p class="hint">No flags.</p>'}</div><div class="card"><div class="top2"><b>Answers</b><span class="schips" id="atf">${[["all","All"],["wrong","Wrong"],["part","Partial"],["blank","Blank"],["pend","To grade"],["full","Correct"]].map(([k,l])=>`<button class="chip ${k=="all"?"on":""}" onclick="attf('${k}',this)">${l}</button>`).join("")}</span></div><div id="atq">${paper(Q,aid,idx)}</div></div>`)}
 async function sg(aid,qid){const{error}=await SB.rpc("grade_answer",{p_attempt:aid,p_question:qid,p_points:parseFloat($("#p"+qid).value),p_comment:$("#c"+qid).value});alert(error?error.message:"Saved")}
 async function trashAtt(aid,rid){const{error}=await SB.rpc("trash_attempt",{p_attempt:aid});if(error)alert(error.message);else toast("Moved to trash. Restore it from Library → Trash.");runv(rid)}
 
@@ -855,13 +855,35 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 .dr{display:grid;grid-template-columns:minmax(90px,1.2fr) 1fr 90px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
 .dr.ok .tr i{background:var(--sf)}.dr.ok .L{font-weight:600}
 .dr .L{overflow:hidden;text-overflow:ellipsis}
-.atc{display:grid;grid-template-columns:minmax(120px,1.4fr) 1fr 52px 64px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
-tr[hidden]{display:none}
+.atc{display:grid;grid-template-columns:minmax(120px,1.4fr) 1fr 48px 48px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+tr[hidden],.rvq[hidden],.rvs[hidden]{display:none}
+.rvs{margin:18px 0 8px;padding:12px 14px;border-radius:14px;background:var(--tint)}.rvs details{margin-top:6px}
+.rvpas{max-height:260px;overflow:auto;margin-top:6px;font-size:14px;line-height:1.55}
+.rvq{border:1px solid var(--line);border-left:4px solid var(--sb);border-radius:14px;padding:12px 14px;margin:10px 0;background:var(--card)}
+.rvq.full{border-left-color:var(--sf)}.rvq.part{border-left-color:var(--sp)}.rvq.wrong{border-left-color:var(--sw)}.rvq.pend{border-left-color:var(--sg)}
+.rvh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rvpt{font-weight:600}
+.rvb{margin-top:8px}.rvb p{margin:0 0 8px}
+.rvo{display:flex;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0}
+.rvo .L{font-weight:700;min-width:22px;white-space:nowrap}
+.rvo.ok{border-color:var(--sf);background:color-mix(in srgb,var(--sf) 14%,transparent)}
+.rvo.bad{border-color:var(--sw);background:color-mix(in srgb,var(--sw) 14%,transparent)}
+.rvt{font-style:normal;font-size:12px;font-weight:600;white-space:nowrap}
+.rvo.ok .rvt{color:var(--sf)}.rvo.bad .rvt{color:var(--sw)}
+.rvg{display:inline-block;padding:1px 8px;margin:0 3px;border-radius:8px;font-weight:600;border:1px solid transparent}
+.rvg.ok{background:color-mix(in srgb,var(--sf) 16%,transparent);color:var(--sf);border-color:var(--sf)}
+.rvg.bad{background:color-mix(in srgb,var(--sw) 16%,transparent);color:var(--sw);border-color:var(--sw)}
+.rvg.blank{background:var(--bg);color:var(--mut);font-weight:400;border-color:var(--line)}
+.rvk{font-size:13px;color:var(--sf);font-weight:600}.rvn{color:var(--mut);font-size:11px;margin-left:2px}
+.rvt2.ok{background:color-mix(in srgb,var(--sf) 22%,transparent);border-radius:6px}.rvt2.bad{background:color-mix(in srgb,var(--sw) 22%,transparent);border-radius:6px;text-decoration:line-through}.rvt2.miss{outline:2px dashed var(--sp);border-radius:6px}
+.rvtx{white-space:pre-wrap;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);margin-top:6px}
+.rvgr{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grow{flex:1}
+
 @media(max-width:600px){
  .sg>summary{grid-template-columns:1fr auto}.sg>summary .sgn{order:1}.sg>summary .pill{order:2}.sg>summary small{order:3;grid-column:1/-1}.sg>summary .sbar{order:4;grid-column:1/-1}
  .sq{grid-template-columns:1fr 48px}.sq .sbar,.sq small,.sq .cr{grid-column:1/-1}
  .sst{grid-template-columns:repeat(3,1fr)}.dr{grid-template-columns:1fr 70px}.dr .tr{grid-column:1/-1;order:3}
- .atc{grid-template-columns:1fr auto auto}.atc .sbar{grid-column:1/-1;order:4}.atc .pill{justify-self:end}}
+ .atc{grid-template-columns:1fr 48px}.atc .tr{grid-column:1/-1;order:3}.atc span:last-child{display:none}}
 </style>
 <script id="stats-js">
 const TYN={mcq:"Multiple choice",mcq_multi:"Multiple choice (multi)",tfng:"True / False / Not given",gap_fill:"Gap fill",word_formation:"Word formation",error_id:"Error identification",matching:"Matching",paragraph_gap:"Paragraph gap",essay:"Essay",sentence_transformation:"Sentence transformation"},
@@ -870,7 +892,7 @@ GD={type:"Question type",part:"Part",section:"Section",skill:"Skill"},SK5=["full
 const ptl=q=>q.part&&(q.part.title||q.part.name)||"",
  gkey=(d,q)=>d=="type"?(q.type||"?"):d=="skill"?(q.skill||"?"):d=="part"?(ptl(q)||"No part"):((ptl(q)?ptl(q)+" › ":"")+((q.section&&q.section.title)||"No section")),
  glab=(d,k)=>d=="type"?(TYN[k]||k):d=="skill"?(SKN[k]||k):k,
- cst=(q,x)=>{if(!x)return"blank";if(MAN.includes(q.type)&&x.points==null)return"pend";const p=+x.points||0;return p>=q.points-.001?"full":p>0?"part":"wrong"},
+ cst=(q,x)=>{if(!x)return"blank";if(x.response!==undefined&&emptyR(q,x.response))return"blank";if(MAN.includes(q.type)&&x.points==null)return"pend";const p=+x.points||0;return p>=q.points-.001?"full":p>0?"part":"wrong"},
  pc=(g,t)=>t>0?Math.round(g/t*100):null,tone=p=>p==null?"":p>=80?"hi":p>=50?"md":"lo",
  pill=p=>`<span class="pill ${tone(p)}">${p==null?"–":p+"%"}</span>`,
  nmOf=a=>esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")+(a.attempt_no>1?" #"+a.attempt_no:"");
@@ -880,13 +902,16 @@ const sbar=o=>{const t=o.cells||1;return`<div class="sbar">${SK5.map(k=>o[k]?`<i
  sleg=()=>`<div class="sleg">${SK5.map(k=>`<span><i class="s-${k}"></i>${SBL[k]}</span>`).join("")}</div>`,
  cnts=o=>SK5.filter(k=>o[k]).map(k=>`${SBL[k]} ${o[k]}`).join(" · ");
 function groups(d,Qs){const m=new Map();Qs.forEach(q=>{const k=gkey(d,q);if(!m.has(k))m.set(k,[]);m.get(k).push(q)});return[...m.entries()]}
-function keyList(q){const k=q.key;if(k==null)return[];if(typeof k=="string")return[k];if(Array.isArray(k.choices))return k.choices;if(k.choice!=null)return[k.choice];return[]}
-function ktxt(q){try{const k=q.key;if(k==null)return"";if(typeof k=="string")return k;const j=v=>Array.isArray(v)?v.join(" / "):v;
+const acc=a=>Array.isArray(a)?a:(a==null||a===""?[]:[a]),nz=(v,cs)=>{v=String(v==null?"":v).trim().replace(/\s+/g," ");return cs?v:v.toLowerCase()};
+function emptyR(q,r){if(r==null)return true;if(Array.isArray(r.choices))return!r.choices.length;if(r.choice!=null)return String(r.choice)==="";if(r.blanks)return!Object.values(r.blanks).some(v=>String(v||"").trim());if(r.slots)return!Object.values(r.slots).some(Boolean);if(r.marks)return!r.marks.length;if(r.form!=null||r.base!=null)return!String(r.form||"").trim();if(r.text!=null)return!String(r.text).trim();return false}
+function keyList(q){const k=q.key;if(k==null)return[];if(typeof k=="string")return[k];if(k.correct!=null)return acc(k.correct).map(v=>String(v).toUpperCase()==String(v)&&q.type=="tfng"?String(v).toUpperCase():v);if(Array.isArray(k.choices))return k.choices;if(k.choice!=null)return[k.choice];return[]}
+function ktxt(q){try{const k=q.key;if(k==null)return"";if(typeof k=="string")return k;const j=v=>acc(v).join(" / ");
+ if(k.correct!=null)return acc(k.correct).map(v=>String(v).replace("_"," ")).join(", ");
  if(Array.isArray(k.choices))return k.choices.join(", ");if(k.choice!=null)return String(k.choice).replace("_"," ");
- if(k.blanks&&typeof k.blanks=="object")return Object.entries(k.blanks).map(([n,v])=>n+": "+j(v)).join(" · ");
+ if(k.blanks&&typeof k.blanks=="object")return Object.entries(k.blanks).map(([n,v])=>n+": "+j(v&&v.accept!=null?v.accept:v)).join(" · ");
  if(k.slots&&typeof k.slots=="object")return Object.entries(k.slots).map(([n,v])=>n+" → "+v).join(" · ");
- if(Array.isArray(k.marks))return k.marks.map(m=>(m.tokens||[]).join(",")+" → "+j(m.correction||"")).join(" · ");
- if(k.base!=null||k.form!=null)return(k.base||"")+" → "+j(k.form||"");
+ if(Array.isArray(k.errors))return k.errors.map(e=>(e.tokens||[]).join(",")+" → "+j(e.accept)).join(" · ");
+ if(k.base!=null||k.accept!=null)return(k.base||"")+" → "+j(k.accept);
  if(k.sample)return k.sample;return JSON.stringify(k)}catch(e){return""}}
 let SD="type",SM="groups",SO=new Set(),RESP={};
 function idxOf(){if(!RD)return new Map();if(!idxOf.c||idxOf.c.r!==RD.an){const m=new Map();RD.an.forEach(x=>m.set(x.attempt_id+"|"+x.question_id,x));idxOf.c={r:RD.an,m}}return idxOf.c.m}
@@ -928,7 +953,25 @@ async function stCsv(){if(!RD)return;const{r,at}=RD,id=r.id;if(!RESP[id]||!RESP[
  const s=rows.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n"),l=document.createElement("a");l.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));l.download=(r.snapshot.title||"results").replace(/[^\w\-]+/g,"_")+"_detail.csv";l.click()}
 function statDraw(f){const h=$("#stx");if(!h||!RD)return;let s;try{s=stHtml()}catch(e){console.error(e);s='<p class="hint">Could not build the breakdown.</p>'}if(!f&&h._h===s)return;h._h=s;h.innerHTML=s}
 {const _r2=rdraw;rdraw=function(){const x=_r2.apply(this,arguments);statDraw();return x}}
-function attf(s,b){document.querySelectorAll("#atq tr[data-st]").forEach(r=>r.hidden=!(s=="all"||r.dataset.st==s));document.querySelectorAll("#atf .chip").forEach(c=>c.classList.toggle("on",c===b))}
+const rvo=(k,t,ok,pk)=>`<div class="rvo ${ok?"ok":pk?"bad":""}${pk?" pk":""}"><span class="L">${esc(k)}</span><span class="grow">${esc(t)}</span>${pk?`<em class="rvt">${ok?"✓ Chosen":"✗ Chosen"}</em>`:ok?`<em class="rvt">Correct answer</em>`:""}</div>`,
+ rvg=(v,ok)=>v==null||String(v).trim()===""?`<span class="rvg blank">blank</span>`:`<span class="rvg ${ok?"ok":"bad"}">${esc(v)}</span>`,
+ rvk=l=>l.length?` <span class="rvk">→ ${esc(l.join(" / "))}</span>`:"";
+function rbody(q,x){const c=q.content||{},k=q.key||{},r=x&&x.response||{},t=q.type;
+ if(t=="mcq"||t=="mcq_multi"){const kc=keyList(q),ch=r.choices||(r.choice!=null?[r.choice]:[]);return`<p>${fm(c.prompt)}</p>`+(c.options||[]).map(o=>rvo(o.key,o.text,kc.includes(o.key),ch.includes(o.key))).join("")}
+ if(t=="tfng"){const kc=[String(k.correct!=null?acc(k.correct)[0]:k.choice||"").toUpperCase()],ch=r.choice!=null?[String(r.choice).toUpperCase()]:[];return`<p>${fm(c.statement)}</p>`+["TRUE","FALSE","NOT_GIVEN"].map(o=>rvo(o.replace("_"," "),"",kc.includes(o),ch.includes(o))).join("")}
+ if(t=="gap_fill"){const bl=r.blanks||{};return`<p>${String(c.text||"").split(/___(\d+)___/).map((p,j)=>{if(j%2==0)return fm(p);const kb=(k.blanks||{})[p]||{},ls=acc(kb.accept!=null?kb.accept:kb),v=bl[p],ok=v!=null&&String(v).trim()!==""&&ls.some(a=>nz(a,kb.case_sensitive)==nz(v,kb.case_sensitive));return`<sup class="rvn">${esc(p)}</sup>`+rvg(v,ok)+(ok?"":rvk(ls))}).join("")}</p>`}
+ if(t=="word_formation"){const ls=acc(k.accept),okb=k.base==null||nz(r.base)==nz(k.base),okf=r.form!=null&&ls.some(a=>nz(a)==nz(r.form));return`<p>${fm(c.text)}</p><div>Base word: ${rvg(r.base,okb)}${okb?"":rvk([k.base])}</div><div style="margin-top:6px">Form: ${rvg(r.form,okf)}${okf?"":rvk(ls)}</div>`}
+ if(t=="error_id"){const tk=String(c.text||"").split(/\s+/),S=new Set((r.marks||[]).flatMap(m=>m.tokens||[])),K=new Set((k.errors||[]).flatMap(e=>e.tokens||[]));
+  return`<p>${tk.map((w,i)=>`<span class="tok rvt2 ${S.has(i)&&K.has(i)?"ok":S.has(i)?"bad":K.has(i)?"miss":""}">${esc(w)}</span>`).join(" ")}</p>`+(k.errors||[]).map(e=>{const m=(r.marks||[]).find(m=>(m.tokens||[]).some(t=>(e.tokens||[]).includes(t))),ls=acc(e.accept),ok=m&&ls.some(a=>nz(a)==nz(m.correction));return`<div style="margin-top:6px"><s>${esc((e.tokens||[]).map(i=>tk[i]).join(" "))}</s> → ${m?rvg(m.correction,ok):`<span class="rvg blank">not marked</span>`}${ok?"":rvk(ls)}</div>`}).join("")}
+ if(t=="matching"){const sl=r.slots||{},ks=k.slots||{};return(c.prompt?`<p>${fm(c.prompt)}</p>`:"")+`<div class="mop">${(c.options||[]).map(o=>`<div><b>${esc(o.key)}</b><span>${fm(o.text)}</span></div>`).join("")}</div>`+(c.items||[]).map(it=>{const ok=sl[it.n]&&sl[it.n]==ks[it.n];return`<div class="mit"><span class="n">${esc(it.n)}</span><span class="grow">${fm(it.text)}</span>${rvg(sl[it.n],ok)}${ok?"":rvk([ks[it.n]])}</div>`}).join("")}
+ if(t=="paragraph_gap"){const sl=r.slots||{},ks=k.slots||{};return`<div class="pg">${String(c.text||"").split(/\[(\d+)\]/).map((p,j)=>{if(j%2==0)return fm(p);const ok=sl[p]&&sl[p]==ks[p];return`<sup class="rvn">${esc(p)}</sup>`+rvg(sl[p],ok)+(ok?"":rvk([ks[p]]))}).join("")}</div><div class="hint" style="margin:12px 0 6px">Paragraphs</div>${(c.paragraphs||[]).map(p=>`<div class="pgp"><b>${esc(p.key)}</b><span>${fm(p.text)}</span></div>`).join("")}`}
+ return`<p>${fm(c.prompt||c.text||"")}</p><div class="rvtx">${x&&x.response&&x.response.text?esc(x.response.text):'<span class="hint">No answer</span>'}</div>`}
+function qrev(q,x,aid){const s=cst(q,x),man=MAN.includes(q.type),pt=ptl(q),sc=q.section&&q.section.title,pts=x&&x.points!=null?x.points:(man&&x?null:0);
+ return`<div class="rvq ${s}" data-st="${s}"><div class="rvh"><b>${esc(q.title)}</b><small class="hint">${esc(TYN[q.type]||q.type)}${pt||sc?" · "+esc([pt,sc].filter(Boolean).join(" › ")):""}</small><span class="grow"></span><span class="sbadge ${s}">${SBL[s]}</span><span class="rvpt">${pts==null?"–":pts} / ${q.points}</span></div><div class="rvb">${rbody(q,x)}${man&&(q.key||{}).sample?`<details style="margin-top:8px"><summary class="hint">Sample answer</summary><div class="rvtx">${esc(q.key.sample)}</div></details>`:""}</div>${man?`<div class="rvgr"><input type="text" size="4" id="p${q.id}" value="${x&&x.points!=null?x.points:""}"> / ${q.points} <input type="text" id="c${q.id}" placeholder="comment" value="${esc(x&&x.comment||"")}"> <button class="btn pri" onclick="sg('${aid}','${q.id}')">Save</button></div>`:""}</div>`}
+function paper(Q,aid,idx){let last=null;return Q.map(q=>{const key=(q.part&&q.part.id||ptl(q))+"|"+(q.section&&q.section.id||""),pt=q.part||{},sc=q.section||{};let h="";
+  if(key!==last){last=key;const ins=sc.instruction||pt.instruction,ps=sc.passage_md||pt.passage_md,ttl=[ptl(q),sc.title].filter(Boolean).join(" › ");h=ttl||ins||ps?`<div class="rvs">${ttl?`<b>${esc(ttl)}</b>`:""}${ins?`<div class="hint">${fm(ins)}</div>`:""}${ps?`<details><summary class="hint">Passage</summary><div class="rvpas">${fm(ps)}</div></details>`:""}</div>`:""}
+  return h+qrev(q,idx.get(aid+"|"+q.id),aid)}).join("")}
+function attf(s,b){document.querySelectorAll("#atq .rvq").forEach(r=>r.hidden=!(s=="all"||r.dataset.st==s));document.querySelectorAll("#atq .rvs").forEach(r=>r.hidden=s!="all");document.querySelectorAll("#atf .chip").forEach(c=>c.classList.toggle("on",c===b))}
 function attInfo(Q,aid,rid,idx){const me=[{id:aid}],o=agg(Q,me,idx),p=pc(o.got,o.pts),cl=RD&&RD.r&&RD.r.id==rid?subOf().filter(a=>a.id!=aid):[],cidx=cl.length?idxOf():null;
  const dims=["type","part","section","skill"],blocks=dims.map((d,i)=>{const g=groups(d,Q);if(d!="type"&&d!="skill"&&g.length<2&&g[0]&&/^No /.test(g[0][0]))return"";
   const rows=g.map(([k,qs])=>{const a1=agg(qs,me,idx),pp=pc(a1.got,a1.pts),cc=cl.length?agg(qs,cl,cidx):null,cp=cc?pc(cc.got,cc.pts):null;return`<div class="atc"><span>${esc(glab(d,k))}<small class="hint"> ${a1.full}/${qs.length} correct</small></span>${sbar(a1)}${pill(pp)}${cl.length?`<span class="hint" title="Class average">⌀ ${cp==null?"–":cp+"%"}</span>`:""}</div>`}).join("");
