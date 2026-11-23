@@ -461,10 +461,8 @@ async function testv(id,tab){tab=tab||"details";const bp=tab=="questions"?qtab(i
  page("library",`<div class="hd"><div><small class="eyebrow">TEST</small><h1>${esc(t.title)}</h1></div><span><button class="btn" onclick="prevTest('${id}')">▶ Preview</button><button class="btn" onclick="aud('${id}')">🎧 Recordings</button><button class="btn pri" onclick="newch('${id}')">Start a challenge</button></span></div><div class="tabs">${[["details","Details"],["questions","Questions"],["sessions","Past sessions"]].map(x=>`<button class="tab ${x[0]==tab?"on":""}" onclick="testv('${id}','${x[0]}')">${x[1]}</button>`).join("")}</div>${body}`)}
 async function savet(id){SWRC={};const{error}=await SB.from("tests").update({title:$("#f_t").value,default_time_limit_min:parseInt($("#f_l").value)||null,default_extra_attempts:parseInt($("#f_r").value)||0,reveal_policy:$("#f_v").value,shuffle_in_sections:$("#f_s").checked,tags:ptags($("#f_g").value),public_link_enabled:$("#f_p").checked}).eq("id",id);alert(error?error.message:"Saved")}
 async function qtab(id){const{data:tq}=await SB.from("test_questions").select("position,q:questions(id,title,type,skill,points,content,section_id,sections(id,title,instruction,parts(id,title)))").eq("test_id",id).order("position");QT=id;QP=(tq||[]).map(x=>x.q);QK={};if(QP.length)SB.from("question_keys").select("question_id,answer_key").in("question_id",QP.map(x=>x.id)).then(r=>{(r.data||[]).forEach(x=>QK[x.question_id]=x.answer_key)});const tree=[],pi={},si={};
- QP.forEach(q=>{const s=q.sections,p=s&&s.parts,pk=p?p.id:"-",sk=s?s.id:"-";if(!pi[pk]){pi[pk]={t:p?p.title:"",k:pk,secs:[]};tree.push(pi[pk])}if(!si[sk]){si[sk]={t:s?s.title:"",qs:[]};pi[pk].secs.push(si[sk])}si[sk].qs.push(q)});
- return`<div class="qlay"><div class="card"><button class="btn pri" style="width:100%;margin-bottom:6px" onclick="qed(null,'${id}')">+ Add question</button>${tree.map(p=>{const sh=pshut().includes(p.k);return`<div class="pt1 ptg${sh?" shut":""}" role="button" tabindex="0" aria-expanded="${!sh}" onclick="ptog(this,'${p.k}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();ptog(this,'${p.k}')}"><i>▾</i> ${esc(p.t||"(no part)")}</div><div class="pbody"${sh?" hidden":""}>${p.secs.map(s=>`<div class="st1">${esc(s.t)}</div><div class="chips">${s.qs.map(q=>`<button class="chip" id="qc_${q.id}" onclick="qsel('${q.id}')">${esc(q.title||"?")}</button>`).join("")}</div>`).join("")}</div>`}).join("")}</div><div class="card" id="qpv"><p class="hint">Select a question to preview it with its answer key.</p></div></div>`}
-function pshut(){try{const a=JSON.parse(localStorage.getItem("qshut")||"[]");return Array.isArray(a)?a:[]}catch(e){return[]}}
-function ptog(h,k){const b=h.nextElementSibling,shut=!b.hidden;b.hidden=shut;h.classList.toggle("shut",shut);h.setAttribute("aria-expanded",String(!shut));try{const a=pshut().filter(x=>x!==k);if(shut)a.push(k);localStorage.setItem("qshut",JSON.stringify(a))}catch(e){}}
+ QP.forEach(q=>{const s=q.sections,p=s&&s.parts,pk=p?p.id:"-",sk=s?s.id:"-";if(!pi[pk]){pi[pk]={t:p?p.title:"",secs:[]};tree.push(pi[pk])}if(!si[sk]){si[sk]={t:s?s.title:"",qs:[]};pi[pk].secs.push(si[sk])}si[sk].qs.push(q)});
+ return`<div class="qlay"><div class="card"><button class="btn pri" style="width:100%;margin-bottom:6px" onclick="qed(null,'${id}')">+ Add question</button>${tree.map(p=>`<div class="pt1">${esc(p.t)}</div>${p.secs.map(s=>`<div class="st1">${esc(s.t)}</div><div class="chips">${s.qs.map(q=>`<button class="chip" id="qc_${q.id}" onclick="qsel('${q.id}')">${esc(q.title||"?")}</button>`).join("")}</div>`).join("")}`).join("")}</div><div class="card" id="qpv"><p class="hint">Select a question to preview it with its answer key.</p></div></div>`}
 async function qsel(qid){document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.id=="qc_"+qid));const q=QP.find(x=>x.id==qid),key=QK[qid]!==undefined?(QK[qid]||{}):(((await SB.from("question_keys").select("answer_key").eq("question_id",qid).single()).data||{}).answer_key||{}),c=q.content||{};let b="";
  if(q.type=="mcq"||q.type=="mcq_multi")b=`<p>${fm(c.prompt)}</p>`+(c.options||[]).map(o=>`<div class="opt ${(key.correct||[]).includes(o.key)?"ok":""}"><span class="L">${esc(o.key)}</span><span>${esc(o.text)}</span></div>`).join("");
  else if(q.type=="tfng")b=`<p>${fm(c.statement)}</p><p class="okc"><b>Answer: ${esc(key.correct)}</b></p>`;
@@ -480,65 +478,19 @@ async function stab(id){const{data:rs}=await SB.from("runs").select("id,join_cod
 // ----- Teacher: import
 const IMP_UP='<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>',
 IMP_FILE='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
-function imp(){VIEW="t";EX=null;page("import",`<div class="hd"><div><small class="eyebrow">STEP 1 · SOURCE</small><h1>Import exam</h1></div></div><div class="card impc"><p class="hint">Choose the .json file prepared from your Word exam. It is checked here before anything is saved.</p><label class="drop" id="dz" for="jf"><span class="di">${IMP_UP}</span><b id="dzt">Drop a PDF, Word, image or .json file here</b><small id="dzs">or click to browse · PDF, .docx, PNG, JPEG, WebP or .json</small><input type="file" id="jf" accept=".json,application/json,application/pdf,image/png,image/jpeg,image/webp,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="impFile(this)"></label><p class="hint" style="margin:14px 0 6px">Or paste the questions here</p><textarea id="itx" rows="5" style="width:100%" placeholder="Paste the questions (and the answers, if you have them)…"></textarea><div class="iact" style="margin-top:8px"><button class="btn pri" onclick="impAI(null)">Import with AI</button></div><ol class="isteps"><li>Prepare the .json file from your Word exam</li><li>Drop it here. It is checked instantly</li><li>Set a time limit, then import</li></ol></div><div id="imp"></div>`)}
+function imp(){VIEW="t";EX=null;page("import",`<div class="hd"><div><small class="eyebrow">STEP 1 · SOURCE</small><h1>Import exam</h1></div></div><div class="card impc"><p class="hint">Choose the .json file prepared from your Word exam. It is checked here before anything is saved.</p><label class="drop" id="dz" for="jf"><span class="di">${IMP_UP}</span><b id="dzt">Drop your .json file here</b><small id="dzs">or click to browse · .json only</small><input type="file" id="jf" accept=".json,application/json" onchange="impFile(this)"></label><ol class="isteps"><li>Prepare the .json file from your Word exam</li><li>Drop it here. It is checked instantly</li><li>Set a time limit, then import</li></ol></div><div id="imp"></div>`)}
 function impErr(m){const o=$("#imp");if(o)o.innerHTML='<div class="card impr"><p class="badc" style="margin:0">'+esc(m)+'</p></div>';const z=$("#dz");if(z)z.classList.remove("done")}
 function impFile(inp){const f=inp.files[0];if(f)impRead(f)}
-let RV={sel:1};
-function rvFlat(){const a=[];(EX.parts||[]).forEach((p,pi)=>{(p.sections||[]).forEach((s,si)=>(s.questions||[]).forEach(q=>a.push({q,p,s,pi,si})));(p.questions||[]).forEach(q=>a.push({q,p,s:null,pi,si:-1}))});(EX.questions||[]).forEach(q=>a.push({q,p:null,s:null,pi:-1,si:-1}));return a}
-const rvNoKey=q=>!q.drop&&!["essay","sentence_transformation"].includes(q.type)&&(q.key==null);
-const rvCur=()=>rvFlat()[RV.sel-1];
-function impAI(f,tx0,nm){const tx=tx0!=null?tx0:(($("#itx")||{}).value||"");if(!f&&!tx.trim())return toast("Drop a file or paste some text first",true);
- if(f&&f.size>12*1024*1024)return impErr("This file is over 12 MB. Split it and import in parts.");
- const run=async file=>{$("#imp").innerHTML='<div class="card impr"><b>Reading your document…</b><p class="hint" style="margin:0">The AI is mapping parts, sections and questions. This can take a minute or two. Please keep this tab open.</p></div>';
-  const{data,error}=await SB.functions.invoke("smart-handler",{body:{text:tx,file}});
-  if(error||!data||data.error){impErr((data&&data.error)||(error&&error.message)||"Import failed");return}
-  EX=data.exam;RV={sel:1,fn:f?f.name:(nm||"Pasted text"),kb:f?(f.size/1024).toFixed(0)+" KB":""};
-  if(!rvFlat().length){impErr("The AI found no questions in this document.");return}
-  const z=$("#dz");if(z){z.classList.add("done");$("#dzt").textContent="Document read. Drop another to replace it";$("#dzs").textContent=RV.fn}
-  const f1=rvFlat().find(x=>!rvNoKey(x.q));rvDraw()};
- if(!f)return run(null);
- const fr=new FileReader();fr.onload=()=>run({media_type:f.type,data:String(fr.result).split(",")[1]});fr.onerror=()=>impErr("Could not read this file.");fr.readAsDataURL(f)}
-async function docxText(f){const b=new Uint8Array(await f.arrayBuffer()),v=new DataView(b.buffer),td=new TextDecoder();let e=b.length-22;while(e>=0&&v.getUint32(e,1)!==0x06054b50)e--;if(e<0)throw 0;
- const n=v.getUint16(e+10,1);let p=v.getUint32(e+16,1);
- for(let i=0;i<n;i++){const m=v.getUint16(p+10,1),cs=v.getUint32(p+20,1),nl=v.getUint16(p+28,1),el=v.getUint16(p+30,1),cl=v.getUint16(p+32,1),of=v.getUint32(p+42,1),nm=td.decode(b.subarray(p+46,p+46+nl));
-  if(nm=="word/document.xml"){const st=of+30+v.getUint16(of+26,1)+v.getUint16(of+28,1),d=b.subarray(st,st+cs);
-   const xml=m==0?td.decode(d):await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
-   return xml.replace(/<w:tab\/>/g,"\t").replace(/<w:br[^>]*\/>/g,"\n").replace(/<\/w:p>/g,"\n").replace(/<\/w:tc>/g,"\t").replace(/<\/w:tr>/g,"\n").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&").replace(/\n{3,}/g,"\n\n").trim()}
-  p+=46+nl+el+cl}throw 0}
-function impRead(f){if(!f)return;if(/\.docx$/i.test(f.name)){$("#imp").innerHTML='<div class="card impr"><b>Opening your Word file…</b></div>';return docxText(f).then(t=>{if(!t.trim())return impErr("This Word file has no text.");impAI(null,t,f.name)}).catch(()=>impErr("Could not read this Word file. Make sure it is .docx (not .doc)."))}if(/\.(pdf|png|jpe?g|webp)$/i.test(f.name)||/^(application\/pdf|image\/)/.test(f.type))return impAI(f);if(!/\.json$/i.test(f.name)&&f.type!=="application/json"){impErr("Please choose a .json file.");return}
- f.text().then(t=>{let j;try{j=JSON.parse(t)}catch(e){impErr("This file is not valid JSON.");return}
- if(!j||typeof j!=="object"){impErr("This file is not a valid exam.");return}
- EX=j;RV={sel:1,fn:f.name,kb:f.size<1024?f.size+" B":(f.size/1024).toFixed(1)+" KB"};
+function impRead(f){if(!f)return;if(!/\.json$/i.test(f.name)&&f.type!=="application/json"){impErr("Please choose a .json file.");return}
+ f.text().then(t=>{try{EX=JSON.parse(t)}catch(e){impErr("This file is not valid JSON.");return}
+ if(!EX||typeof EX!=="object"){impErr("This file is not a valid exam.");return}
+ const qs=[];(EX.parts||[]).forEach(p=>(p.sections||[]).forEach(s=>(s.questions||[]).forEach(q=>qs.push(q))));const pts=qs.reduce((a,q)=>a+(+q.points||0),0),nk=qs.filter(q=>!q.key).map(q=>q.title),kb=f.size<1024?f.size+" B":(f.size/1024).toFixed(1)+" KB";
  const z=$("#dz");if(z){z.classList.add("done");$("#dzt").textContent="File loaded. Drop another to replace it";$("#dzs").textContent=f.name}
- if(!rvFlat().length){impErr("No questions were found in this file.");return}rvDraw()})}
-function rvDraw(){const fl=rvFlat(),kept=fl.filter(x=>!x.q.drop),miss=fl.filter(x=>rvNoKey(x.q)).length,pts=kept.reduce((a,x)=>a+(+x.q.points||1),0);
- let tree="",lp=null,ls=null,o=false;
- fl.forEach((x,i)=>{const sk=x.pi+"."+x.si;if(x.pi!==lp){tree+=(o?"</div>":"")+`<div class="pt1">${esc(x.p?(x.p.title||"Part "+(x.pi+1)):"Outside every part")}</div>`;o=false;lp=x.pi;ls=null}
-  if(sk!==ls){tree+=(o?"</div>":"")+`<div class="st1">${esc(x.s?(x.s.title||x.s.instruction||"Section "+(x.si+1)):"Outside sections")}</div><div class="chips">`;o=true;ls=sk}
-  tree+=`<button class="chip${i+1==RV.sel?" on":""}${rvNoKey(x.q)?" amb":""}${x.q.drop?" gry":""}" onclick="rvSel(${i+1})">${esc(x.q.title||i+1)}</button>`});
- if(o)tree+="</div>";
- $("#imp").innerHTML=`<div class="card impr"><small class="eyebrow">STEP 2 · REVIEW &amp; SAVE</small><div class="ifile"><span class="fi">${IMP_FILE}</span><div class="grow"><b>${esc(EX.title||"Untitled exam")}</b><small class="hint">${esc(RV.fn||"")} · ${RV.kb||""}</small></div></div><div class="istats"><div><b>${kept.length}</b><small>Questions</small></div><div><b>${pts}</b><small>Points</small></div><div><b>${miss}</b><small>Need an answer</small></div></div>${miss?`<div class="iwarn"><b>${miss} question${miss>1?"s":""} still need an answer</b><span>Click the amber numbers, set the answer, or discard the question.</span></div>`:'<p class="iok">✓ Every kept question has an answer</p>'}<div class="iact"><button class="btn pri" ${miss||!kept.length?"disabled":""} onclick="rvSave()">Save ${kept.length} question${kept.length==1?"":"s"}</button></div></div><div class="qlay" style="margin-top:14px"><div class="card">${tree}</div><div class="card" id="rvc">${rvCard(fl[RV.sel-1])}</div></div>`}
-function rvSel(i){RV.sel=i;rvDraw()}
-function rvCard(x){if(!x)return"";const q=x.q,c=q.content||(q.content={}),t=q.type,k=q.key,pk=c.prompt!=null?"prompt":c.statement!=null?"statement":"text";let b="";
- if(t=="mcq"||t=="mcq_multi"){const ok=(k&&k.correct)||[];b=(c.options||[]).map((o,i)=>`<div class="ro"><input type="${t=="mcq"?"radio":"checkbox"}" name="rvo" ${ok.includes(o.key)?"checked":""} onchange="rvOk(${i})"><b>${esc(o.key)}</b><input type="text" value="${esc(o.text)}" oninput="rvOpt(${i},this.value)"></div>`).join("")}
- else if(t=="tfng")b=`<div class="chips">${["TRUE","FALSE","NOT_GIVEN"].map(v=>`<button class="chip${k&&String(k.correct).toUpperCase()==v?" on":""}" onclick="rvTf('${v}')">${v.replace("_"," ")}</button>`).join("")}</div>`;
- else if(t=="essay"||t=="sentence_transformation")b='<p class="hint">Marked by hand. No answer key needed.</p>';
- else b=`<p class="hint">Answer key (JSON)</p><textarea rows="5" style="width:100%;font-family:monospace" onchange="rvKey(this.value)">${esc(k==null?"":JSON.stringify(k))}</textarea>`;
- return`<div class="top2"><small class="hint">${esc(q.skill||"")} · ${esc(t||"")}</small><button class="btn" onclick="rvDrop()">${q.drop?"Keep":"Discard"}</button></div><textarea rows="3" style="width:100%;margin:8px 0" oninput="rvC('${pk}',this.value)">${esc(c[pk]||"")}</textarea>${b}<p class="hint" style="margin:10px 0 2px">Explanation (optional, shown with the student's result)</p><textarea rows="2" style="width:100%" oninput="rvCur().q.explanation=this.value">${esc(q.explanation||"")}</textarea>`}
-function rvC(f,v){rvCur().q.content[f]=v}
-function rvOpt(i,v){rvCur().q.content.options[i].text=v}
-function rvOk(i){const q=rvCur().q,key=q.content.options[i].key;if(q.type=="mcq")q.key={correct:[key]};else{const a=(q.key&&q.key.correct)||[];q.key={correct:a.includes(key)?a.filter(x=>x!=key):[...a,key]};if(!q.key.correct.length)q.key=null}rvDraw()}
-function rvTf(v){rvCur().q.key={correct:v};rvDraw()}
-function rvKey(v){const q=rvCur().q;if(!v.trim()){q.key=null;return rvDraw()}try{q.key=JSON.parse(v)}catch(e){toast("That is not valid JSON",true);return}rvDraw()}
-function rvDrop(){const q=rvCur().q;q.drop=!q.drop;rvDraw()}
-async function rvSave(){const{data}=await SB.from("group_members").select("group_id,groups(name)").eq("profile_id",U.id).eq("member_role","teacher");
- if(!(data||[]).length)return toast("You do not teach any class yet",true);
- modal(`<h2 style="margin:0">Save questions</h2><p class="hint">Every question joins your library. Choose whether they also form a test.</p><div class="seg"><label><input type="radio" name="rvm" value="test" checked> <b>A new test</b></label><label><input type="radio" name="rvm" value="library"> <b>Library only</b><br><span class="hint">At least one tag is required</span></label></div><p class="hint" style="margin:8px 0 2px">Class</p><select id="rvg" style="width:100%">${data.map(g=>`<option value="${g.group_id}">${esc(g.groups&&g.groups.name||"Class")}</option>`).join("")}</select><p class="hint" style="margin:8px 0 2px">Test name</p><input type="text" id="rvt" style="width:100%" value="${esc(EX.title||"")}"><p class="hint" style="margin:8px 0 2px">Time limit (minutes, blank = none)</p><input type="text" id="rvl" size="4" inputmode="numeric" value="${esc(EX.time_limit_min||"")}"><p class="hint" style="margin:8px 0 2px">Tags (comma separated, e.g. b2, unit-7)</p><input type="text" id="rvtg" style="width:100%"><div class="acts"><button class="btn" onclick="mclose()">Cancel</button><button class="btn pri" id="rvgo" onclick="rvGo()">Save</button></div>`)}
-async function rvGo(){const g=$("#rvgo");g.disabled=true;g.textContent="Saving…";
- const mode=document.querySelector('input[name=rvm]:checked').value,tags=$("#rvtg").value.split(",").map(x=>x.trim()).filter(Boolean);
- const{data,error}=await SB.rpc("import_exam_v2",{p_exam:EX,p_opts:{mode,group_id:$("#rvg").value,title:$("#rvt").value,time_limit_min:parseInt($("#rvl").value)||null,tags}});
- if(error){g.disabled=false;g.textContent="Save";toast(error.message,true);return}
- mclose();toast(data.questions+" questions saved");data.test_id?testv(data.test_id,"questions"):lib("questions")}
+ $("#imp").innerHTML=`<div class="card impr"><small class="eyebrow">STEP 2 · REVIEW</small><div class="ifile"><span class="fi">${IMP_FILE}</span><div class="grow"><b>${esc(EX.title||"Untitled exam")}</b><small class="hint">${esc(f.name)} · ${kb}</small></div></div><div class="istats"><div><b>${qs.length}</b><small>Questions</small></div><div><b>${pts}</b><small>Points</small></div><div><b>${(EX.parts||[]).length}</b><small>Parts</small></div></div>${!qs.length?'<p class="iwarn">No questions were found in this file.</p>':""}${nk.length?`<div class="iwarn"><b>Missing answer keys</b><span>${esc(nk.join(", "))}</span></div>`:(qs.length?'<p class="iok">✓ Every question has an answer key</p>':"")}<div class="iact"><label class="tlf"><span>Time limit</span><input type="text" id="tl" size="4" inputmode="numeric" value="${esc(EX.time_limit_min||"")}"><em>minutes · leave blank for no limit</em></label><button class="btn pri" id="igo" ${nk.length||!qs.length?"disabled":""} onclick="impGo()">Import exam</button></div></div>`})}
+async function impGo(){const g=$("#igo");if(g){g.disabled=true;g.textContent="Importing…"}
+ const{error}=await SB.rpc("import_exam",{p_exam:EX,p_time:parseInt($("#tl").value)||null});
+ if(error){if(g){g.disabled=false;g.textContent="Import exam"}toast(error.message,true);return}
+ toast("Exam imported");lib()}
 (()=>{const z=()=>document.getElementById("dz");
  addEventListener("dragover",e=>{const d=z();if(!d)return;e.preventDefault();d.classList.add("over")});
  addEventListener("dragleave",e=>{const d=z();if(d&&!e.relatedTarget)d.classList.remove("over")});
@@ -550,7 +502,7 @@ async function chl(){VIEW="t";const{data:rs}=await SB.from("runs").select("id,jo
 
 // ----- Teacher: results of one run
 async function runv(id,oc){VIEW="t";RD=null;
- page("challenges",`<div class="hd"><div><small class="eyebrow">RESULTS</small><h1 id="rh">…</h1></div><span><button class="btn" onclick="chl()">All runs</button><button class="btn pri" onclick="ctlm('${id}')">Join code &amp; controls</button><button class="btn" onclick="csv()">Export</button><button class="btn dng" onclick="delRun(['${id}'])">🗑 Delete</button></span></div><div class="stats" id="rcards"></div><div class="two2" style="margin-top:14px"><div class="card"><b>Score distribution</b><div id="dist"></div></div><div class="card"><b>Accuracy by skill</b><div id="skl"></div></div></div><div class="tabs"><button class="tab" id="tb_student" onclick="RT='student';rdraw()">Per student</button><button class="tab" id="tb_question" onclick="RT='question';rdraw()">Per question</button></div><div class="card" id="rtab" style="padding:6px 8px;overflow:auto"></div>`);
+ page("challenges",`<div class="hd"><div><small class="eyebrow">RESULTS</small><h1 id="rh">…</h1></div><span><button class="btn" onclick="chl()">All runs</button><button class="btn pri" onclick="ctlm('${id}')">Join code &amp; controls</button><button class="btn" onclick="csv()">Export</button><button class="btn dng" onclick="delRun(['${id}'])">🗑 Delete</button></span></div><div class="stats" id="rcards"></div><div class="two2" style="margin-top:14px"><div class="card"><b>Score distribution</b><div id="dist"></div></div><div class="card"><b>Accuracy by skill</b><div id="skl"></div></div></div><div class="card" id="stx" style="margin-top:14px"></div><div class="tabs"><button class="tab" id="tb_student" onclick="RT='student';rdraw()">Per student</button><button class="tab" id="tb_question" onclick="RT='question';rdraw()">Per question</button></div><div class="card" id="rtab" style="padding:6px 8px;overflow:auto"></div>`);
  await rload(id);if(oc)ctlm(id);poll=setInterval(()=>rload(id),4000)}
 async function rload(id){const[{data:r},{data:at}]=await Promise.all([SB.from("runs").select("*").eq("id",id).single(),SB.from("attempts").select("id,status,current_position,points_earned,points_possible,provisional,counted,attempt_no,last_seen_at,started_at,submitted_at,student_id,guest_name,profiles(full_name)").eq("run_id",id).is("deleted_at",null).order("started_at")]);if(!r)return;const ids=(at||[]).map(a=>a.id);
  let rk=[],an=[],ra=null;if(ids.length){const[x,y]=await Promise.all([SB.from("risk_events").select("attempt_id,kind").in("attempt_id",ids),SB.from("answers").select("attempt_id,question_id,points").in("attempt_id",ids).is("deleted_at",null).limit(5000)]);rk=x.data||[];an=y.data||[]}
@@ -578,8 +530,8 @@ async function due(id){const v=prompt("Due date and time, e.g. 2026-11-20 23:59 
 async function act2(fn,run,rec){const{error}=await SB.rpc(fn,{p_run:run,p_recording:rec});if(error)alert(error.message);rload(run)}
 function csv(){if(!RD)return;const{r,at,rk,an}=RD,rows=[["Student","Attempt","Counted","Status","Points","Possible","Percent","Answered","Risk","Seconds","Submitted"]].concat(at.map(a=>[a.profiles&&a.profiles.full_name||a.guest_name||"Guest",a.attempt_no,a.counted?"yes":"",a.status,a.points_earned,a.points_possible,a.points_possible?Math.round(a.points_earned/a.points_possible*100):0,an.filter(x=>x.attempt_id==a.id).length,rk.filter(x=>x.attempt_id==a.id).length,a.submitted_at?Math.round((new Date(a.submitted_at)-new Date(a.started_at))/1000):"",a.submitted_at||""])),s=rows.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n"),l=document.createElement("a");l.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));l.download=(r.snapshot.title||"results").replace(/[^\w\-]+/g,"_")+".csv";l.click()}
 // ----- Teacher: one student's attempt
-async function attv(aid,rid){clearInterval(poll);const[{data:r},{data:an},{data:rk},{data:a}]=await Promise.all([SB.from("runs").select("snapshot").eq("id",rid).single(),SB.from("answers").select("question_id,response,points,comment").eq("attempt_id",aid),SB.from("risk_events").select("kind,detail,occurred_at").eq("attempt_id",aid).order("occurred_at"),SB.from("attempts").select("points_earned,points_possible,provisional,guest_name,profiles(full_name)").eq("id",aid).single()]);const Q=r.snapshot.questions||[];
- page("challenges",`<div class="hd"><div><small class="eyebrow">STUDENT</small><h1>${esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")}</h1><span class="hint">${a.points_earned}/${a.points_possible} points${a.provisional?" · provisional":""}</span></div><span><button class="btn" onclick="runv('${rid}')">← Results</button><button class="btn" onclick="if(confirm('Move this attempt to the trash?'))trashAtt('${aid}','${rid}')">🗑 Trash</button></span></div><div class="card"><b>Risk</b>${(rk||[]).length?rk.map(x=>`<div class="hint">${new Date(x.occurred_at).toLocaleTimeString()} · ${x.kind}${x.kind=="audio_seek"&&x.detail?` (from ${fmt(x.detail.from)} to ${fmt(x.detail.to)})`:""}</div>`).join(""):'<p class="hint">No flags.</p>'}</div><div class="card" style="overflow:auto"><table><tr><th>#</th><th>Question</th><th>Answer</th><th>Points</th></tr>${Q.map(q=>{const x=(an||[]).find(y=>y.question_id==q.id),c=q.content||{},man=["essay","sentence_transformation"].includes(q.type);return`<tr><td>${esc(q.title)}</td><td>${esc(String(c.prompt||c.text||c.statement||"").slice(0,120))}</td><td>${esc(x?rtxt(q,x.response):"–")}${man&&(q.key||{}).sample?`<div class="hint">Sample: ${esc(q.key.sample)}</div>`:""}</td><td>${man?`<input type="text" size="4" id="p${q.id}" value="${x&&x.points!=null?x.points:""}"> / ${q.points}<br><input type="text" id="c${q.id}" placeholder="comment" value="${esc(x&&x.comment||"")}"><br><button class="btn pri" onclick="sg('${aid}','${q.id}')">Save</button>`:(x&&x.points!=null?x.points+" / "+q.points:"0 / "+q.points)}</td></tr>`}).join("")}</table></div>`)}
+async function attv(aid,rid){clearInterval(poll);const[{data:r},{data:an},{data:rk},{data:a}]=await Promise.all([SB.from("runs").select("snapshot").eq("id",rid).single(),SB.from("answers").select("question_id,response,points,comment").eq("attempt_id",aid),SB.from("risk_events").select("kind,detail,occurred_at").eq("attempt_id",aid).order("occurred_at"),SB.from("attempts").select("points_earned,points_possible,provisional,guest_name,profiles(full_name)").eq("id",aid).single()]);const Q=r.snapshot.questions||[],idx=new Map();(an||[]).forEach(x=>idx.set(aid+"|"+x.question_id,x));
+ page("challenges",`<div class="hd"><div><small class="eyebrow">STUDENT</small><h1>${esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")}</h1><span class="hint">${a.points_earned}/${a.points_possible} points${a.provisional?" · provisional":""}</span></div><span><button class="btn" onclick="runv('${rid}')">← Results</button><button class="btn" onclick="if(confirm('Move this attempt to the trash?'))trashAtt('${aid}','${rid}')">🗑 Trash</button></span></div>${attInfo(Q,aid,rid,idx)}<div class="card"><b>Risk</b>${(rk||[]).length?rk.map(x=>`<div class="hint">${new Date(x.occurred_at).toLocaleTimeString()} · ${x.kind}${x.kind=="audio_seek"&&x.detail?` (from ${fmt(x.detail.from)} to ${fmt(x.detail.to)})`:""}</div>`).join(""):'<p class="hint">No flags.</p>'}</div><div class="card" style="overflow:auto"><div class="top2"><b>Answers</b><span class="schips" id="atf">${[["all","All"],["wrong","Wrong"],["part","Partial"],["blank","Blank"],["pend","To grade"],["full","Correct"]].map(([k,l])=>`<button class="chip ${k=="all"?"on":""}" onclick="attf('${k}',this)">${l}</button>`).join("")}</span></div><table id="atq"><tr><th>#</th><th>Question</th><th>Answer</th><th>Points</th></tr>${Q.map(q=>{const x=idx.get(aid+"|"+q.id),c=q.content||{},man=MAN.includes(q.type),s=cst(q,x),kt=ktxt(q),pt=q.part&&(q.part.title||q.part.name),sc=q.section&&q.section.title;return`<tr data-st="${s}"><td>${esc(q.title)}<div class="hint">${esc(TYN[q.type]||q.type)}</div>${pt||sc?`<div class="hint">${esc([pt,sc].filter(Boolean).join(" › "))}</div>`:""}</td><td>${esc(String(c.prompt||c.text||c.statement||"").slice(0,120))}</td><td><span class="sbadge ${s}">${SBL[s]}</span><div class="t-${s}" style="margin-top:4px">${esc(x?rtxt(q,x.response):"–")}</div>${kt&&!man&&s!="full"?`<div class="hint">Key: ${esc(kt)}</div>`:""}${man&&(q.key||{}).sample?`<div class="hint">Sample: ${esc(q.key.sample)}</div>`:""}</td><td>${man?`<input type="text" size="4" id="p${q.id}" value="${x&&x.points!=null?x.points:""}"> / ${q.points}<br><input type="text" id="c${q.id}" placeholder="comment" value="${esc(x&&x.comment||"")}"><br><button class="btn pri" onclick="sg('${aid}','${q.id}')">Save</button>`:(x&&x.points!=null?x.points+" / "+q.points:"0 / "+q.points)}</td></tr>`}).join("")}</table></div>`)}
 async function sg(aid,qid){const{error}=await SB.rpc("grade_answer",{p_attempt:aid,p_question:qid,p_points:parseFloat($("#p"+qid).value),p_comment:$("#c"+qid).value});alert(error?error.message:"Saved")}
 async function trashAtt(aid,rid){const{error}=await SB.rpc("trash_attempt",{p_attempt:aid});if(error)alert(error.message);else toast("Moved to trash. Restore it from Library → Trash.");runv(rid)}
 
@@ -729,7 +681,7 @@ rip{position:absolute;border-radius:50%;background:currentColor;pointer-events:n
 .bulk[hidden]{display:none}
 @media(max-width:860px){.bulk{bottom:88px}}
 </style>
-<style id="ui-v2-css">.chip.amb:not(.on){background:var(--warn)}.chip.gry{opacity:.4}.ro{display:flex;gap:8px;align-items:center;margin:6px 0}.ro input[type=text]{flex:1}.ptg{cursor:pointer;display:flex;gap:6px;align-items:baseline;user-select:none}.ptg i{font-style:normal;display:inline-block;transition:transform .15s}.ptg.shut i{transform:rotate(-90deg)}.pbody[hidden]{display:none}@media(prefers-reduced-motion:reduce){.ptg i{transition:none}}
+<style id="ui-v2-css">
 /* ten thuong hieu dai hon */
 .sbt b{font-size:15px;line-height:1.25;overflow-wrap:anywhere}.top>b{font-size:14px;line-height:1.25;min-width:0;overflow-wrap:anywhere}
 /* tab: nen mau truot sang tab duoc chon */
@@ -870,6 +822,118 @@ document.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".side nav .ni");
  if(b&&b._pd&&Date.now()-b._pd<700&&e.isTrusted){b._pd=0;e.stopImmediatePropagation();e.preventDefault()}},true);
 })();
+</script>
+<style id="stats-css">
+:root{--sf:#2f9e55;--sp:#e0a526;--sw:#d64545;--sb:#c9bfc4;--sg:#7f9bd0}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--sf:#4cc57a;--sp:#e7b84a;--sw:#ef6a6a;--sb:#5a4e55;--sg:#7f9bd0}}
+[data-theme=dark]{--sf:#4cc57a;--sp:#e7b84a;--sw:#ef6a6a;--sb:#5a4e55;--sg:#7f9bd0}
+.sbar{display:flex;height:10px;border-radius:9px;overflow:hidden;background:var(--line);min-width:80px}
+.sbar i{display:block;height:100%}
+.s-full{background:var(--sf)}.s-part{background:var(--sp)}.s-wrong{background:var(--sw)}.s-blank{background:var(--sb)}
+.s-pend{background:repeating-linear-gradient(45deg,var(--sg) 0 4px,transparent 4px 8px)}
+.sleg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--mut);margin:10px 0 4px}
+.sleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.schips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;align-items:center}.schips .sp{flex:1}
+.chip.on{background:var(--tint);border-color:var(--pri);color:var(--pri);font-weight:600}
+.sg{border-top:1px solid var(--line)}
+.sg>summary{display:grid;grid-template-columns:minmax(120px,1.4fr) auto minmax(90px,1fr) 48px;gap:10px;align-items:center;padding:10px 4px;cursor:pointer;list-style:none}
+.sg>summary::-webkit-details-marker{display:none}
+.sgn{font-weight:600}
+.sgb{padding:0 4px 12px}
+.sgh{margin:14px 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.sq{display:grid;grid-template-columns:70px 1fr 100px minmax(80px,1fr) 48px;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+.sq small{color:var(--mut)}
+.mx{overflow:auto}.mx table{min-width:max-content}
+.mx th{font-size:12px;max-width:140px}
+.mx tr.avg td{font-weight:600;border-top:2px solid var(--line)}
+.sbadge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;color:#fff}
+.sbadge.full{background:var(--sf)}.sbadge.part{background:var(--sp)}.sbadge.wrong{background:var(--sw)}.sbadge.blank{background:var(--sb)}.sbadge.pend{background:var(--sg)}
+.t-full{color:var(--sf)}.t-wrong{color:var(--sw)}.t-part{color:var(--sp)}
+.sst{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
+.sst div{padding:10px;border-radius:12px;background:var(--bg)}
+.sst b{font-size:22px;display:block}.sst small{color:var(--mut)}
+.dr{display:grid;grid-template-columns:minmax(90px,1.2fr) 1fr 90px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
+.dr.ok .tr i{background:var(--sf)}.dr.ok .L{font-weight:600}
+.dr .L{overflow:hidden;text-overflow:ellipsis}
+.atc{display:grid;grid-template-columns:minmax(120px,1.4fr) 1fr 52px 64px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+tr[hidden]{display:none}
+@media(max-width:600px){
+ .sg>summary{grid-template-columns:1fr auto}.sg>summary .sgn{order:1}.sg>summary .pill{order:2}.sg>summary small{order:3;grid-column:1/-1}.sg>summary .sbar{order:4;grid-column:1/-1}
+ .sq{grid-template-columns:1fr 48px}.sq .sbar,.sq small,.sq .cr{grid-column:1/-1}
+ .sst{grid-template-columns:repeat(3,1fr)}.dr{grid-template-columns:1fr 70px}.dr .tr{grid-column:1/-1;order:3}
+ .atc{grid-template-columns:1fr auto auto}.atc .sbar{grid-column:1/-1;order:4}.atc .pill{justify-self:end}}
+</style>
+<script id="stats-js">
+const TYN={mcq:"Multiple choice",mcq_multi:"Multiple choice (multi)",tfng:"True / False / Not given",gap_fill:"Gap fill",word_formation:"Word formation",error_id:"Error identification",matching:"Matching",paragraph_gap:"Paragraph gap",essay:"Essay",sentence_transformation:"Sentence transformation"},
+MAN=["essay","sentence_transformation"],SBL={full:"Correct",part:"Partial",wrong:"Wrong",blank:"Blank",pend:"To grade"},
+GD={type:"Question type",part:"Part",section:"Section",skill:"Skill"},SK5=["full","part","wrong","blank","pend"];
+const ptl=q=>q.part&&(q.part.title||q.part.name)||"",
+ gkey=(d,q)=>d=="type"?(q.type||"?"):d=="skill"?(q.skill||"?"):d=="part"?(ptl(q)||"No part"):((ptl(q)?ptl(q)+" › ":"")+((q.section&&q.section.title)||"No section")),
+ glab=(d,k)=>d=="type"?(TYN[k]||k):d=="skill"?(SKN[k]||k):k,
+ cst=(q,x)=>{if(!x)return"blank";if(MAN.includes(q.type)&&x.points==null)return"pend";const p=+x.points||0;return p>=q.points-.001?"full":p>0?"part":"wrong"},
+ pc=(g,t)=>t>0?Math.round(g/t*100):null,tone=p=>p==null?"":p>=80?"hi":p>=50?"md":"lo",
+ pill=p=>`<span class="pill ${tone(p)}">${p==null?"–":p+"%"}</span>`,
+ nmOf=a=>esc(a.profiles&&a.profiles.full_name||a.guest_name||"Guest")+(a.attempt_no>1?" #"+a.attempt_no:"");
+function agg(Qs,ats,idx){const o={n:Qs.length,pts:0,got:0,cells:0,full:0,part:0,wrong:0,blank:0,pend:0};
+ Qs.forEach(q=>ats.forEach(a=>{const x=idx.get(a.id+"|"+q.id),s=cst(q,x);o.cells++;o[s]++;if(s=="pend")return;o.pts+=q.points;o.got+=x&&x.points!=null?(+x.points||0):0}));return o}
+const sbar=o=>{const t=o.cells||1;return`<div class="sbar">${SK5.map(k=>o[k]?`<i class="s-${k}" style="width:${o[k]/t*100}%" title="${SBL[k]} ${o[k]}"></i>`:"").join("")}</div>`},
+ sleg=()=>`<div class="sleg">${SK5.map(k=>`<span><i class="s-${k}"></i>${SBL[k]}</span>`).join("")}</div>`,
+ cnts=o=>SK5.filter(k=>o[k]).map(k=>`${SBL[k]} ${o[k]}`).join(" · ");
+function groups(d,Qs){const m=new Map();Qs.forEach(q=>{const k=gkey(d,q);if(!m.has(k))m.set(k,[]);m.get(k).push(q)});return[...m.entries()]}
+function keyList(q){const k=q.key;if(k==null)return[];if(typeof k=="string")return[k];if(Array.isArray(k.choices))return k.choices;if(k.choice!=null)return[k.choice];return[]}
+function ktxt(q){try{const k=q.key;if(k==null)return"";if(typeof k=="string")return k;const j=v=>Array.isArray(v)?v.join(" / "):v;
+ if(Array.isArray(k.choices))return k.choices.join(", ");if(k.choice!=null)return String(k.choice).replace("_"," ");
+ if(k.blanks&&typeof k.blanks=="object")return Object.entries(k.blanks).map(([n,v])=>n+": "+j(v)).join(" · ");
+ if(k.slots&&typeof k.slots=="object")return Object.entries(k.slots).map(([n,v])=>n+" → "+v).join(" · ");
+ if(Array.isArray(k.marks))return k.marks.map(m=>(m.tokens||[]).join(",")+" → "+j(m.correction||"")).join(" · ");
+ if(k.base!=null||k.form!=null)return(k.base||"")+" → "+j(k.form||"");
+ if(k.sample)return k.sample;return JSON.stringify(k)}catch(e){return""}}
+let SD="type",SM="groups",SO=new Set(),RESP={};
+function idxOf(){if(!RD)return new Map();if(!idxOf.c||idxOf.c.r!==RD.an){const m=new Map();RD.an.forEach(x=>m.set(x.attempt_id+"|"+x.question_id,x));idxOf.c={r:RD.an,m}}return idxOf.c.m}
+const subOf=()=>RD.at.filter(a=>(a.counted||a.student_id==null)&&a.status!="in_progress");
+function stTog(e){const k=SD+"|"+SM+"|"+e.dataset.k;e.open?SO.add(k):SO.delete(k)}
+const dopen=k=>SO.has(SD+"|"+SM+"|"+k)?" open":"",dk=k=>esc(k);
+function stHtml(){const{r}=RD,Q=r.snapshot.questions||[],ats=subOf(),idx=idxOf();
+ const head=`<div class="top2"><b>Breakdown</b><span class="hint">${ats.length} submitted attempt${ats.length==1?"":"s"} counted</span></div><div class="schips">${Object.keys(GD).map(k=>`<button class="chip ${SD==k?"on":""}" onclick="SD='${k}';statDraw(1)">${GD[k]}</button>`).join("")}<span class="sp"></span>${[["groups","Groups"],["matrix","Students × groups"],["items","Questions"]].map(([k,l])=>`<button class="chip ${SM==k?"on":""}" onclick="SM='${k}';statDraw(1)">${l}</button>`).join("")}</div>`;
+ if(!Q.length)return head+'<p class="hint">No questions in this run.</p>';
+ if(!ats.length)return head+'<p class="hint">No submitted attempts yet.</p>';
+ const n=ats.length;
+ if(SM=="groups"){let g=groups(SD,Q).map(([k,qs])=>({k,qs,o:agg(qs,ats,idx)}));
+  if(SD=="type"||SD=="skill")g.sort((a,b)=>(pc(a.o.got,a.o.pts)??101)-(pc(b.o.got,b.o.pts)??101));
+  return head+`<p class="hint" style="margin:0 0 4px">${SD=="type"||SD=="skill"?"Weakest first. ":""}Tap a row for its questions.</p>`+sleg()+g.map(({k,qs,o})=>{const p=pc(o.got,o.pts);
+   return`<details class="sg" data-k="${dk(k)}" ontoggle="stTog(this)"${dopen(k)}><summary><span class="sgn">${esc(glab(SD,k))}</span><small class="hint">${qs.length} Q · ${o.got%1?o.got.toFixed(1):o.got}/${o.pts} pts</small>${sbar(o)}${pill(p)}</summary><div class="sgb"><div class="hint" style="margin-bottom:6px">${cnts(o)}</div>${qs.map(q=>{const o2=agg([q],ats,idx),p2=pc(o2.got,o2.pts);return`<div class="sq"><span>${esc(q.title)}</span><small>${esc(TYN[q.type]||q.type)}</small><span class="cr">${o2.full}/${n} correct</span>${sbar(o2)}${pill(p2)}</div>`}).join("")}</div></details>`}).join("")}
+ if(SM=="matrix"){const gs=groups(SD,Q),tot=agg(Q,ats,idx);
+  return head+`<div class="mx"><table><tr><th>Student</th>${gs.map(([k])=>`<th>${esc(glab(SD,k))}</th>`).join("")}<th>Total</th></tr>${ats.map(a=>`<tr class="clk" onclick="attv('${a.id}','${r.id}')"><td>${nmOf(a)}</td>${gs.map(([k,qs])=>{const o=agg(qs,[a],idx);return`<td>${pill(pc(o.got,o.pts))}</td>`}).join("")}<td>${pill(pc(agg(Q,[a],idx).got,agg(Q,[a],idx).pts))}</td></tr>`).join("")}<tr class="avg"><td>Class</td>${gs.map(([k,qs])=>{const o=agg(qs,ats,idx);return`<td>${pill(pc(o.got,o.pts))}</td>`}).join("")}<td>${pill(pc(tot.got,tot.pts))}</td></tr></table></div><p class="hint">Cells are % of points. Tap a student for their detailed answers.</p>`}
+ /* items */
+ const E=RESP[r.id];if(!E||E.n!==RD.an.length)stLoad(r.id);
+ if(E===false)return head+`<p class="hint">Could not load the answers. <button class="btn" onclick="delete RESP['${r.id}'];statDraw(1)">Retry</button></p>`;
+ if(!E||!E.m)return head+'<p class="hint">Loading answers…</p>';
+ return head+`<div class="top2"><span class="hint">Choice distribution and most common wrong answers.</span><button class="btn" onclick="stCsv()">Export detailed CSV</button></div>`+groups(SD,Q).map(([k,qs])=>`<div class="sgh">${esc(glab(SD,k))}</div>`+qs.map(q=>{const o=agg([q],ats,idx),p=pc(o.got,o.pts);
+   return`<details class="sg" data-k="${dk(q.id)}" ontoggle="stTog(this)"${dopen(q.id)}><summary><span class="sgn">${esc(q.title)}</span><small class="hint">${esc(TYN[q.type]||q.type)}</small>${sbar(o)}${pill(p)}</summary><div class="sgb">${ktxt(q)&&!MAN.includes(q.type)?`<div class="hint" style="margin-bottom:6px">Key: ${esc(ktxt(q))}</div>`:""}${dist(q,ats,E.m)}</div></details>`}).join("")).join("")}
+function drow(l,c,n,ok){return`<div class="dr ${ok?"ok":""}"><span class="L">${l}</span><div class="tr"><i style="width:${n?c/n*100:0}%"></i></div><span>${c} · ${n?Math.round(c/n*100):0}%</span></div>`}
+function dist(q,ats,m){const c=q.content||{},n=ats.length,rs=ats.map(a=>m.get(a.id+"|"+q.id)),kl=keyList(q);let opts=null;
+ if(q.type=="mcq"||q.type=="mcq_multi")opts=(c.options||[]).map(o=>({k:o.key,t:o.text}));else if(q.type=="tfng")opts=["TRUE","FALSE","NOT_GIVEN"].map(k=>({k,t:k.replace("_"," ")}));
+ if(opts){const cnt={};let bl=0;rs.forEach(x=>{const r=x&&x.response,ch=r?(r.choices||(r.choice!=null?[r.choice]:[])):[];if(!ch.length)bl++;ch.forEach(k=>cnt[k]=(cnt[k]||0)+1)});
+  return opts.map(o=>drow(esc(o.k)+" · "+esc(String(o.t).slice(0,60))+(kl.includes(o.k)?" ✓":""),cnt[o.k]||0,n,kl.includes(o.k))).join("")+(bl?drow("No answer",bl,n,false):"")}
+ if(MAN.includes(q.type)){const g=rs.filter(x=>x&&x.points!=null);return`<p class="hint">Manually graded · ${g.length}/${n} graded${g.length?" · average "+(g.reduce((s,x)=>s+(+x.points||0),0)/g.length).toFixed(1)+" / "+q.points:""}</p>`}
+ const w=new Map();let bl=0;rs.forEach(x=>{const s=cst(q,x);if(s=="blank"){bl++;return}if(s=="full")return;const t=rtxt(q,x.response);w.set(t,(w.get(t)||0)+1)});
+ const top=[...w.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+ return(top.length?`<div class="hint">Most common wrong answers</div>`+top.map(([t,k])=>drow(esc(String(t).slice(0,80)),k,n,false)).join(""):'<p class="hint">No wrong answers recorded.</p>')+(bl?drow("No answer",bl,n,false):"")}
+async function stLoad(id){const c=stLoad.f=stLoad.f||{};if(c[id])return;c[id]=1;const ids=RD.at.map(a=>a.id),m=new Map();
+ if(ids.length){const{data,error}=await SB.from("answers").select("attempt_id,question_id,response,points").in("attempt_id",ids).is("deleted_at",null).limit(5000);if(error){RESP[id]=false;c[id]=0;toast(error.message,true);statDraw(1);return}(data||[]).forEach(x=>m.set(x.attempt_id+"|"+x.question_id,x))}
+ RESP[id]={m,n:RD.an.length};c[id]=0;statDraw(1)}
+async function stCsv(){if(!RD)return;const{r,at}=RD,id=r.id;if(!RESP[id]||!RESP[id].m){await stLoad(id)}const E=RESP[id];if(!E||!E.m)return;
+ const Q=r.snapshot.questions||[],rows=[["Student","Attempt","Counted","Question","Type","Part","Section","Skill","Response","Points","Max","Status"]];
+ at.forEach(a=>Q.forEach(q=>{const x=E.m.get(a.id+"|"+q.id);rows.push([a.profiles&&a.profiles.full_name||a.guest_name||"Guest",a.attempt_no,a.counted?"yes":"",q.title,TYN[q.type]||q.type,ptl(q),q.section&&q.section.title||"",SKN[q.skill]||q.skill,x?rtxt(q,x.response):"",x&&x.points!=null?x.points:"",q.points,SBL[cst(q,x)]])}));
+ const s=rows.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n"),l=document.createElement("a");l.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));l.download=(r.snapshot.title||"results").replace(/[^\w\-]+/g,"_")+"_detail.csv";l.click()}
+function statDraw(f){const h=$("#stx");if(!h||!RD)return;let s;try{s=stHtml()}catch(e){console.error(e);s='<p class="hint">Could not build the breakdown.</p>'}if(!f&&h._h===s)return;h._h=s;h.innerHTML=s}
+{const _r2=rdraw;rdraw=function(){const x=_r2.apply(this,arguments);statDraw();return x}}
+function attf(s,b){document.querySelectorAll("#atq tr[data-st]").forEach(r=>r.hidden=!(s=="all"||r.dataset.st==s));document.querySelectorAll("#atf .chip").forEach(c=>c.classList.toggle("on",c===b))}
+function attInfo(Q,aid,rid,idx){const me=[{id:aid}],o=agg(Q,me,idx),p=pc(o.got,o.pts),cl=RD&&RD.r&&RD.r.id==rid?subOf().filter(a=>a.id!=aid):[],cidx=cl.length?idxOf():null;
+ const dims=["type","part","section","skill"],blocks=dims.map((d,i)=>{const g=groups(d,Q);if(d!="type"&&d!="skill"&&g.length<2&&g[0]&&/^No /.test(g[0][0]))return"";
+  const rows=g.map(([k,qs])=>{const a1=agg(qs,me,idx),pp=pc(a1.got,a1.pts),cc=cl.length?agg(qs,cl,cidx):null,cp=cc?pc(cc.got,cc.pts):null;return`<div class="atc"><span>${esc(glab(d,k))}<small class="hint"> ${a1.full}/${qs.length} correct</small></span>${sbar(a1)}${pill(pp)}${cl.length?`<span class="hint" title="Class average">⌀ ${cp==null?"–":cp+"%"}</span>`:""}</div>`}).join("");
+  return`<details class="sg"${i<2?" open":""}><summary><span class="sgn">By ${GD[d].toLowerCase()}</span><small class="hint">${g.length} group${g.length>1?"s":""}</small><span></span><span></span></summary><div class="sgb">${rows}</div></details>`}).join("");
+ return`<div class="card"><b>Summary</b><div class="sst"><div><b>${o.full}</b><small>Correct</small></div><div><b>${o.part}</b><small>Partial</small></div><div><b>${o.wrong}</b><small>Wrong</small></div><div><b>${o.blank}</b><small>Blank</small></div><div><b>${o.pend}</b><small>To grade</small></div></div>${sbar(o)}<p class="hint" style="margin-bottom:0">${p==null?"No graded points yet":p+"% of "+o.pts+" graded points"}${cl.length?" · ⌀ = class average ("+cl.length+" others)":""}</p>${sleg()}${blocks}</div>`}
 </script>
 <script id="delete-js">
 let DELQ=[];
