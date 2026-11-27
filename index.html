@@ -389,29 +389,28 @@ async function rvStudent(aid,f){if(f)RVF=f;const d=RV&&RV.aid==aid?RV.data:null;
  wrap(`<div class="top2" style="margin-bottom:10px"><h2 style="margin:0">Review: ${esc(d.title||(R&&R.title)||"your answers")}</h2><button class="btn" onclick="result('${aid}')">← Score</button></div><div class="schips"><button class="chip ${RVF=="all"?"on":""}" onclick="rvStudent('${aid}','all')">All (${items.length})</button><button class="chip ${RVF=="wrong"?"on":""}" onclick="rvStudent('${aid}','wrong')">Needs work (${nw})</button></div>${body||'<p class="hint">Nothing to show here. Well done!</p>'}${back}`);window.scrollTo(0,0)}
 // anti-cheat: record, never conclude
 const risk=(k,d)=>{if(R&&R.on&&!R.prev){R.rq.push({k,d:d||null});pqStore();flush()}};
-function hide(k){
-  if(!R||!R.on)return;
-  const t=Date.now();
-  if(!R.awayAt)R.awayAt=t;
-  if(!R.lh||t-R.lh>1500){R.lh=t;risk(k)}
-  $("#veil").style.display="flex"
-}
-function back(){
-  $("#veil").style.display="none";
-  if(R&&R.awayAt){
-    const ms=Date.now()-R.awayAt;
-    R.awayAt=null;
-    if(ms>=500)risk("window_focus",{away_ms:ms});
-  }
-  if(R&&R.fs&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{})
-}
+let AW=null;const KB=[],MB=[];
+const pushB=(a,x)=>{a.push(x);if(a.length>10)a.shift()},recent=(a,t,ms)=>a.filter(x=>t-x.t<=ms).map(x=>x.k+" (-"+(t-x.t)+"ms)");
+document.addEventListener("keydown",e=>{if(!R||!R.on)return;const sp=/^(Alt|Meta|Tab|Escape|PrintScreen|F\d+|ContextMenu|Control)$/.test(e.key);if(sp||e.ctrlKey||e.metaKey||e.altKey)pushB(KB,{t:Date.now(),k:(e.ctrlKey&&e.key!="Control"?"Ctrl+":"")+(e.altKey&&e.key!="Alt"?"Alt+":"")+(e.metaKey&&e.key!="Meta"?"Win+":"")+(e.shiftKey&&e.key!="Shift"?"Shift+":"")+(e.key==" "?"Space":e.key)})},true);
+document.documentElement.addEventListener("mouseleave",e=>{if(R&&R.on)pushB(MB,{t:Date.now(),k:"mouse left via "+(e.clientY<=0?"top edge (tab bar/address bar)":e.clientY>=innerHeight?"bottom edge (taskbar)":e.clientX<=0?"left edge":"right edge")})});
+function ctx(){const pg=R.pg&&R.pg[R.p],c=CT();return{page:R.p+1,pages:R.pg?R.pg.length:null,q:pg&&pg.qs?pg.qs.map(nq):null,done:c[0],total:c[1],left_s:left(),fs:!!document.fullscreenElement,focus:document.hasFocus(),vis:document.visibilityState}}
+function veilMsg(m){const p=$("#veilp"),b=$("#veilb");if(p)p.textContent=m||"You left the exam window or full screen. This was logged for your teacher (time, question and what triggered it).";if(b)b.textContent=R&&R.fs&&!IOS?"Return to full screen":"Continue"}
+function hide(k){if(!R||!R.on)return;const t=Date.now();
+ if(!AW){AW={t0:t,k,tr:[],hid:0,hidMs:0};let c={};try{c=ctx()}catch(x){}risk(k,Object.assign({phase:"leave"},c,{keys:recent(KB,t,2500),mouse:recent(MB,t,2500)}))}
+ AW.tr.push(k+" +"+(t-AW.t0)+"ms");if(k=="tab_hidden"&&!AW.hid)AW.hid=t;
+ document.body.classList.add("away");$("#veil").style.display="flex";veilMsg()}
+function endAway(){FSF=0;const sb=$("#veils");if(sb)sb.style.display="none";$("#veil").style.display="none";document.body.classList.remove("away");const a=AW;AW=null;if(a&&R&&R.on){const t=Date.now();if(a.hid)a.hidMs+=t-a.hid;let c={};try{c=ctx()}catch(x){}risk(a.k,Object.assign({phase:"return",away_s:Math.round((t-a.t0)/1000),hidden_s:Math.round(a.hidMs/1000),triggers:a.tr},c))}}
+let FSF=0;
+async function back(){if(R&&R.fs&&!IOS&&!document.fullscreenElement){try{await document.documentElement.requestFullscreen()}catch(e){FSF++;veilMsg("Full screen is required to continue. Allow full screen for this site, then press the button again.");if(FSF>=3){const b=$("#veils");if(b)b.style.display=""}return}}FSF=0;endAway()}
+function skipFs(){if(!R||!R.on)return;let c={};try{c=ctx()}catch(x){}risk("fullscreen_exit",Object.assign({phase:"fs_unavailable"},c));R.fs=false;endAway()}
 addEventListener("blur",()=>hide("window_blur"));
-addEventListener("focus",()=>{if(R&&R.on&&!document.hidden&&$("#veil").style.display!="flex")back()});
-document.addEventListener("visibilitychange",()=>{if(document.hidden)hide("tab_hidden");else if(R&&R.on&&$("#veil").style.display!="flex")back()});
-document.addEventListener("fullscreenchange",()=>{if(R&&R.fs&&R.on&&!document.fullscreenElement)hide("fullscreen_exit")});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)hide("tab_hidden");else if(AW&&AW.hid){AW.hidMs+=Date.now()-AW.hid;AW.hid=0}});
+document.addEventListener("fullscreenchange",()=>{if(R&&R.fs&&R.on&&!document.fullscreenElement)hide("fullscreen_exit");if(!R||!R.on)lobbyFsChk()});
+function lobbyFsChk(){if(LRDY&&!document.fullscreenElement&&$("#lbr")&&!IOS){LRDY=0;sendReady(false);lobbyBtn()}}
 document.addEventListener("contextmenu",e=>{if(R&&R.on)e.preventDefault()});
 document.addEventListener("copy",e=>{if(R&&R.on&&!e.target.closest("input,textarea")){e.preventDefault();risk("copy_attempt")}});
 document.addEventListener("paste",e=>{if(R&&R.on&&e.target.closest("input,textarea")){risk("paste")}});
+
 // ===== App shell =====
 let VIEW=null,RT="student",RD=null,CF="all",QP=null,EX=null;
 const IC={grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',book:'<path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/>',sparkles:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',radio:'<circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19.1 4.9a10 10 0 0 1 0 14.2M4.9 19.1a10 10 0 0 1 0-14.2"/>',swap:'<path d="M17 3l4 4-4 4"/><path d="M3 7h18"/><path d="M7 21l-4-4 4-4"/><path d="M21 17H3"/>',logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3"/>',chart:'<path d="M3 3v18h18"/><path d="M7 15v3M12 9v9M17 5v13"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',cap:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',leaf:'<path d="M20 4C9 4 4 9 4 15a5 5 0 0 0 5 5c6 0 11-5 11-16z"/><path d="M4 20c3-6 7-9 12-11"/>',chev:'<path d="M11 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/>',refresh:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'};
