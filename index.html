@@ -194,18 +194,66 @@ html{-webkit-text-size-adjust:100%}button,a,input,select,textarea,label{touch-ac
 .lopt{max-width:100%;margin-top:4px}
 </style>
 <style id="rpt-css">
-#rpt{position:fixed;inset:0;z-index:99999;background:var(--bg,#f4f4f5);overflow:auto;-webkit-overflow-scrolling:touch}
+#rpt{position:fixed;inset:0;z-index:99999;background:#e8e4e1;overflow:auto;-webkit-overflow-scrolling:touch}
 .rpbar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:var(--card,#fff);border-bottom:1px solid var(--line,#ddd)}
-.rpw{max-width:820px;margin:0 auto;padding:16px}
-.rp{background:#fff;color:#111;border-radius:12px;padding:28px 30px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.08);font-size:13px;line-height:1.45}
-.rp h1{margin:2px 0 0;font-size:20px}.rp h3{margin:18px 0 6px;font-size:14px;border-bottom:1px solid #ddd;padding-bottom:4px}.rp small{color:#666;font-size:11px;letter-spacing:.04em}
-.rph{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:12px}.rpn{text-align:right}.rpn span{color:#555}
-.rpg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.rpg>div{border:1px solid #ddd;border-radius:8px;padding:8px 10px}.rpg b{display:block;font-size:15px;margin-top:2px}
-.rp table{width:100%;border-collapse:collapse;margin:4px 0 8px}.rp th,.rp td{border:1px solid #ddd;padding:4px 7px;text-align:left;vertical-align:top}.rp th{background:#f3f3f3}
-.rpa tr.full td:last-child{color:#0a6b2d;font-weight:600}.rpa tr.wrong td:last-child{color:#b3261e;font-weight:600}.rpa tr.part td:last-child{color:#9a6700;font-weight:600}.rpa tr.blank td:last-child{color:#777}
-.rpb{display:inline-block;padding:1px 10px;border-radius:99px;font-size:12px;margin-left:6px}.rpb.ok{background:#d9f2e0;color:#0a6b2d}.rpb.md{background:#fdf0c9;color:#7a5600}.rpb.lo{background:#fbd9d6;color:#b3261e}
-.rps{color:#666;font-size:11px;margin:4px 0}.rpt td{word-break:break-word}.rpt td:last-child{font-size:10px;color:#555}.rpx{background:#f6f6f6;border-radius:8px;padding:8px 12px;margin:6px 0}.rpx ul{margin:4px 0 0 16px;padding:0}.rpx li{margin:2px 0}
-@media print{body>*:not(#rpt){display:none!important}#rpt{position:static!important;overflow:visible!important;background:#fff}.rpbar{display:none!important}.rpw{max-width:none;padding:0}.rp{box-shadow:none;border-radius:0;margin:0;padding:0;page-break-after:always}.rp:last-child{page-break-after:auto}.rpa tr{page-break-inside:avoid}}
+.rpw{max-width:840px;margin:0 auto;padding:16px}
+.rp{background:#fff;color:#1b1b1b;border-radius:14px;padding:30px 34px;margin:0 0 18px;box-shadow:0 2px 12px rgba(0,0,0,.1);font-size:13px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp *{box-sizing:border-box}
+.rp small{color:#6b6b6b;font-size:10.5px;letter-spacing:.03em}
+/* header */
+.rph{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:12px;margin-bottom:16px;border-bottom:4px solid #c0305a}
+.rph small{color:#c0305a;font-weight:700;letter-spacing:.12em;font-size:10.5px}
+.rp h1{margin:3px 0 0;font-size:22px;line-height:1.2;font-weight:800}
+.rpn{text-align:right}.rpn b{display:block;font-size:20px;font-weight:800;line-height:1.2}.rpn span{color:#555;font-size:12px}
+/* score hero */
+.rphero{display:flex;align-items:center;gap:22px;border:2px solid;border-radius:18px;padding:18px 24px;margin-bottom:12px}
+.rphero.hi{background:#e3f5e7;border-color:#2a9d4b}.rphero.md{background:#fff3cf;border-color:#e0a800}.rphero.lo{background:#fde2df;border-color:#d33a2f}
+.rpbig{flex:none;line-height:1;white-space:nowrap}.rpbig b{font-size:64px;font-weight:800;letter-spacing:-.03em}.rpbig i{font-style:normal;font-size:28px;font-weight:700;margin-left:2px}
+.rphero.hi .rpbig{color:#17612d}.rphero.md .rpbig{color:#8a5d00}.rphero.lo .rpbig{color:#a8231a}
+.rpmain{flex:1;min-width:0}.rppts{font-size:20px;margin-top:2px}.rppts b{font-size:30px;font-weight:800}.rppts span{font-size:12px;color:#555}
+.rpmeter{height:10px;border-radius:99px;background:rgba(0,0,0,.1);overflow:hidden;margin:8px 0}.rpmeter i{display:block;height:100%;border-radius:99px;background:#2a9d4b}
+.rphero.md .rpmeter i{background:#e0a800}.rphero.lo .rpmeter i{background:#d33a2f}
+.rpcnt{display:flex;flex-wrap:wrap;gap:6px}.rpcnt span{background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:99px;padding:2px 11px;font-size:11.5px}.rpcnt b{font-size:13px}
+.rpcnt .c-full b{color:#17612d}.rpcnt .c-wrong b{color:#a8231a}.rpcnt .c-part b{color:#8a5d00}
+/* info tiles */
+.rpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:4px}
+.rpg>div{border:1px solid #ddd;border-radius:10px;padding:8px 12px;background:#fafafa}.rpg b{display:block;font-size:15px;margin-top:2px;font-weight:700}
+.rpg2>div.on{background:#fff3cf;border-color:#e0a800}.rpg2 b{font-size:20px;font-weight:800}
+/* headings */
+.rp h3{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:22px 0 8px;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#222;break-after:avoid}
+.rp h3::before{content:"";width:5px;height:16px;border-radius:3px;background:#c0305a;margin-right:4px}
+/* tables */
+.rp table{width:100%;border-collapse:collapse;margin:4px 0 8px}
+.rp th,.rp td{border-bottom:1px solid #e3dfdc;padding:6px 8px;text-align:left;vertical-align:top;overflow-wrap:break-word}
+.rp thead{display:table-header-group}
+.rp th{background:#2b2327;color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:0;white-space:nowrap}
+.rp tbody tr:nth-child(even) td{background:#faf7f5}
+.rp .n{text-align:right;white-space:nowrap}.rp .nw{white-space:nowrap}
+.rp td small{display:block;color:#777}
+.rpk td:nth-child(1){font-weight:700}.rpk .rpmeter{margin:3px 0;height:8px;background:#e6e1de;min-width:90px}
+.rpk .rpmeter i.hi{background:#2a9d4b}.rpk .rpmeter i.md{background:#e0a800}.rpk .rpmeter i.lo{background:#d33a2f}
+.rpk td.pp{font-weight:800;font-size:14px}
+.pp.hi{color:#17612d}.pp.md{color:#8a5d00}.pp.lo{color:#a8231a}
+/* integrity */
+.rpb{display:inline-block;padding:2px 14px;border-radius:99px;font-size:12px;font-weight:700;text-transform:none;letter-spacing:0;margin-left:4px}
+.rpb.ok{background:#d9f2e0;color:#17612d}.rpb.md{background:#fdf0c9;color:#7a5600}.rpb.lo{background:#fbd9d6;color:#a8231a}
+.rpx{background:#f5f2ef;border-left:4px solid #c0305a;border-radius:8px;padding:8px 14px;margin:8px 0;font-size:11.5px}
+.rpx ul{margin:4px 0 0 16px;padding:0}.rpx li{margin:2px 0}
+.rpc td:nth-child(2){text-align:center;font-weight:800;font-size:15px;white-space:nowrap}.rpc th:nth-child(2){text-align:center}
+.rpc td:nth-child(1){min-width:120px}
+.rps{color:#666;font-size:11px;margin:6px 0;display:block}
+.rpt td{font-size:11.5px}.rpt td:nth-child(1),.rpt td:nth-child(2){white-space:nowrap}.rpt td:nth-child(3){min-width:110px}.rpt td div{margin:1px 0}
+.rpt tr.w2 td:first-child{box-shadow:inset 3px 0 #e0a800}.rpt tr.w3 td:first-child{box-shadow:inset 3px 0 #d33a2f}
+/* answers */
+.rpa td:nth-child(1){font-weight:700;white-space:nowrap}.rpa td:nth-child(4){white-space:nowrap;text-align:right}.rpa td:nth-child(4) b{font-size:14px}
+.rpa td:nth-child(5){white-space:nowrap}.rpa td:nth-child(3){min-width:90px}
+.rpa tr.full td:first-child{box-shadow:inset 4px 0 #2a9d4b}.rpa tr.wrong td:first-child{box-shadow:inset 4px 0 #d33a2f}.rpa tr.part td:first-child{box-shadow:inset 4px 0 #e0a800}.rpa tr.blank td:first-child{box-shadow:inset 4px 0 #bbb}.rpa tr.pend td:first-child{box-shadow:inset 4px 0 #4a7fd4}
+.bd{display:inline-block;border-radius:99px;padding:1px 10px;font-size:11px;font-weight:700}
+.b-full{background:#d9f2e0;color:#17612d}.b-part{background:#fdf0c9;color:#7a5600}.b-wrong{background:#fbd9d6;color:#a8231a}.b-blank{background:#ececec;color:#555}.b-pend{background:#dde9fb;color:#1d4e9e}
+.rpf{margin-top:18px;padding-top:8px;border-top:1px solid #e3dfdc;display:flex;justify-content:space-between;font-size:10px;color:#999}
+.blk{break-inside:avoid}.rp tr{break-inside:avoid}
+@page{size:A4;margin:12mm}
+@media print{html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body>*:not(#rpt){display:none!important}#rpt{position:static!important;overflow:visible!important;background:#fff}.rpbar{display:none!important}.rpw{max-width:none;padding:0}.rp{box-shadow:none;border-radius:0;margin:0;padding:0;page-break-after:always;break-after:page;font-size:12px}.rp:last-child{page-break-after:auto;break-after:auto}.rpbig b{font-size:56px}}
 </style>
 </head><body><div id="veil"><div><h2>Exam hidden</h2><p class="hint">You left the exam window or full screen. This was logged for your teacher.</p><button class="btn pri" onclick="back()">Continue</button></div></div><div id="app"></div>
 <script>
@@ -644,23 +692,41 @@ const RKX={tab_hidden:["Left the tab or switched app","Chuyển sang tab hoặc 
 RKN=new Proxy({},{get:(o,k)=>RKX[k]?RKX[k][0]:k}),RKV={tab_hidden:"Rời tab / chuyển ứng dụng",window_blur:"Cửa sổ mất tập trung",fullscreen_exit:"Thoát toàn màn hình",audio_seek:"Cố tua âm thanh",copy_attempt:"Thử sao chép",paste:"Dán nội dung"},RKW={tab_hidden:1,window_blur:.5,fullscreen_exit:1,audio_seek:1,copy_attempt:2,paste:2},
 RLV={0:["None","Không có","ok","Không ghi nhận thao tác bất thường nào trong lúc làm bài."],1:["Low","Thấp","ok","Chỉ có một vài sự kiện nhỏ, thường do thao tác vô tình hoặc thông báo trên thiết bị. Không đáng lo ngại."],2:["Medium","Trung bình","md","Có khá nhiều sự kiện. Phụ huynh có thể trao đổi nhẹ nhàng với học sinh về việc giữ tập trung trong lúc làm bài."],3:["High","Cao","lo","Có nhiều sự kiện lặp lại. Nên xem lại cùng giáo viên để hiểu nguyên nhân (không có nghĩa chắc chắn là gian lận)."]};
 const rkh=k=>esc(RKN[k])+(RKV[k]?'<br><small>'+esc(RKV[k])+'</small>':'');
-function rdet(x){const d=x.detail;if(d==null||d==="")return"";if(x.kind=="audio_seek"&&typeof d=="object")return"Từ "+fmt(d.from)+" đến "+fmt(d.to);const f=v=>v==null?"":typeof v=="object"?JSON.stringify(v):String(v);return esc(typeof d!="object"?f(d):Object.entries(d).map(([k,v])=>k+": "+f(v)).join(" · "))}
-const rscore=rk=>(rk||[]).reduce((s,x)=>s+(RKW[x.kind]||1),0),rlev=sc=>RLV[sc==0?0:sc<=3?1:sc<=8?2:3];
+const dur=s=>{s=Math.round(+s||0);return s<60?s+" giây":Math.floor(s/60)+" phút "+(s%60)+" giây"},sec1=ms=>(Math.abs(ms)/1000).toFixed(1).replace(".",",")+" giây";
+const rngS=a=>{a=(a||[]).map(Number).filter(n=>!isNaN(n)).sort((x,y)=>x-y);if(!a.length)return"";const o=[];let s=a[0],p=a[0];for(let i=1;i<=a.length;i++){if(a[i]===p+1){p=a[i];continue}o.push(s==p?""+s:s+"–"+p);s=p=a[i]}return o.join(", ")};
+const EDG={top:"mép trên",bottom:"mép dưới",left:"mép trái",right:"mép phải"};
+function mtr(s){const m=String(s).match(/via (top|right|left|bottom) edge(?: \(([^)]*)\))?\s*\(([-+]?\d+)ms\)/);if(!m)return esc(s);return"chuột ra khỏi trang qua "+EDG[m[1]]+(m[2]?" ("+esc(m[2].replace("tab bar/address bar","thanh tab / thanh địa chỉ"))+")":"")+", "+sec1(+m[3])+" trước đó"}
+function repi(rk){const L=(rk||[]).slice(),used=new Set(),E=[];L.forEach((x,i)=>{const d=x.detail&&typeof x.detail=="object"?x.detail:null;if(d&&d.phase=="return")return;let ret=null;if(d&&d.phase=="leave"){for(let j=i+1;j<L.length;j++){const e=L[j].detail;if(!used.has(j)&&e&&typeof e=="object"&&e.phase=="return"){ret=L[j];used.add(j);break}}}E.push({x,d,ret,rd:ret?ret.detail:null})});
+ L.forEach((x,i)=>{if(!used.has(i)&&x.detail&&typeof x.detail=="object"&&x.detail.phase=="return")E.push({x,d:x.detail,ret:null,rd:x.detail,orphan:1})});return E.sort((a,b)=>new Date(a.x.occurred_at)-new Date(b.x.occurred_at))}
+function rdesc(e){const d=e.d||{},r=e.rd||{},k=e.x.kind,L=[];if(k=="audio_seek"&&d.from!=null)return"Cố kéo âm thanh từ "+fmt(d.from)+" đến "+fmt(d.to)+".";if(!e.d)return"";
+ const c=e.rd||d;if(e.rd&&r.away_s!=null)L.push("<b>Vắng mặt "+dur(r.away_s)+"</b>"+(r.hidden_s?" (tab bị ẩn "+dur(r.hidden_s)+")":""));else if(d.phase=="leave")L.push("Chưa ghi nhận lúc quay lại.");
+ if(c.page!=null)L.push("Đang ở trang "+c.page+(c.pages?"/"+c.pages:"")+(c.total!=null?", đã làm "+(c.done||0)+"/"+c.total+" câu":""));
+ if(c.left_s!=null)L.push("Thời gian còn lại lúc đó: "+fmt(c.left_s));
+ if(Array.isArray(d.mouse)&&d.mouse.length)L.push("Trước khi rời: "+d.mouse.map(mtr).join("; "));
+ if(Array.isArray(r.triggers)&&r.triggers.length)L.push("Diễn biến: "+r.triggers.map(t=>{const m=String(t).match(/^(\w+)\s*([+-]?\d+)ms$/);return m?(RKV[m[1]]||m[1])+(+m[2]?" (+"+sec1(+m[2])+")":""):esc(t)}).join(" → "));
+ if(Array.isArray(d.keys)&&d.keys.length)L.push("Phím bấm: "+esc(d.keys.join(", ")));
+ return L.map(x=>"<div>"+x+"</div>").join("")}
+const rscore=rk=>repi(rk).reduce((s,e)=>s+(RKW[e.x.kind]||1)+((e.rd&&+e.rd.away_s>=30)?1:0),0),rlev=sc=>RLV[sc==0?0:sc<=3?1:sc<=8?2:3];
 function rptOne(r,a,ans,rk){const Q=r.snapshot.questions||[],idx=new Map();(ans||[]).forEach(x=>idx.set(x.question_id,x));
  const nm=esc((a.profiles&&a.profiles.full_name)||a.guest_name||"Guest"),pts=+a.points_earned||0,pos=+a.points_possible||Q.reduce((s,q)=>s+(+q.points||0),0),pc=pos?Math.round(pts/pos*100):0,
  st=a.started_at&&a.submitted_at?Math.max(0,(new Date(a.submitted_at)-new Date((r.mode=="live"&&r.started_at)||a.started_at))/1000):null,
- cnt={};(rk||[]).forEach(x=>cnt[x.kind]=(cnt[x.kind]||0)+1);const sc=Object.entries(cnt).reduce((s,[k,n])=>s+n*(RKW[k]||1),0),lv=RLV[sc==0?0:sc<=3?1:sc<=8?2:3], sk={};Q.forEach(q=>{const x=idx.get(q.id),s=SKN[q.skill]||q.skill||"Other",o=sk[s]||(sk[s]={g:0,m:0});o.m+=+q.points||0;o.g+=x&&x.points!=null?+x.points:0});
- const dv=a.device||a.device_type||"";
- return `<section class="rp"><div class="rph"><div><small>RESULT REPORT</small><h1>${esc(r.snapshot.title||"Test")}</h1></div><div class="rpn"><b>${nm}</b>${a.guest_email?`<br><span>${esc(a.guest_email)}</span>`:""}</div></div>
-<div class="rpg"><div><small>Score</small><b>${pts} / ${pos}</b></div><div><small>Percent</small><b>${pc}%</b></div><div><small>Time spent</small><b>${st!=null?fmt(st):"–"}</b></div><div><small>Submitted</small><b>${a.submitted_at?new Date(a.submitted_at).toLocaleString():"Not submitted"}</b></div><div><small>Attempt</small><b>#${a.attempt_no||1}${a.provisional?" (provisional)":""}</b></div><div><small>Device</small><b>${esc(dv||"–")}</b></div></div>
-<h3>Skills</h3><table><tr><th>Skill</th><th>Points</th><th>%</th></tr>${Object.entries(sk).map(([s,o])=>`<tr><td>${esc(s)}</td><td>${+o.g.toFixed(2)} / ${+o.m.toFixed(2)}</td><td>${o.m?Math.round(o.g/o.m*100):0}%</td></tr>`).join("")}</table>
+ EP=repi(rk),cnt={};EP.forEach(e=>cnt[e.x.kind]=(cnt[e.x.kind]||0)+1);
+ const lv=rlev(rscore(rk)),away=EP.reduce((s,e)=>s+(e.rd&&e.rd.away_s?+e.rd.away_s:0),0),longest=EP.reduce((m,e)=>Math.max(m,e.rd&&e.rd.away_s?+e.rd.away_s:0),0),nLeave=EP.filter(e=>e.d&&e.d.phase).length,
+ sk={};Q.forEach(q=>{const x=idx.get(q.id),s=SKN[q.skill]||q.skill||"Other",o=sk[s]||(sk[s]={g:0,m:0});o.m+=+q.points||0;o.g+=x&&x.points!=null?+x.points:0});
+ const dv=a.device||a.device_type||"",tn=p=>p>=80?"hi":p>=50?"md":"lo",nf=n=>+(+n).toFixed(2),SCN={full:0,part:0,wrong:0,blank:0,pend:0};Q.forEach(q=>{SCN[cst(q,idx.get(q.id))]++});
+ const tm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}),dt=(rk&&rk.length)?new Date(rk[0].occurred_at).toLocaleDateString():"";
+ return `<section class="rp"><div class="rph"><div><small>RESULT REPORT · PHIẾU KẾT QUẢ</small><h1>${esc(r.snapshot.title||"Test")}</h1></div><div class="rpn"><b>${nm}</b>${a.guest_email?`<br><span>${esc(a.guest_email)}</span>`:""}</div></div>
+<div class="rphero ${tn(pc)}"><div class="rpbig"><b>${pc}</b><i>%</i></div><div class="rpmain"><small>SCORE · ĐIỂM</small><div class="rppts"><b>${nf(pts)}</b> / ${nf(pos)} <span>points · điểm</span></div><div class="rpmeter"><i style="width:${Math.min(100,pc)}%"></i></div><div class="rpcnt">${[["full","Correct · Đúng"],["part","Partial · Một phần"],["wrong","Wrong · Sai"],["blank","Blank · Bỏ trống"],["pend","To grade · Chờ chấm"]].filter(([k])=>SCN[k]).map(([k,l])=>`<span class="c-${k}"><b>${SCN[k]}</b> ${l}</span>`).join("")}</div></div></div>
+<div class="rpg"><div><small>Time spent · Thời gian làm</small><b>${st!=null?fmt(st):"–"}</b></div><div><small>Submitted · Giờ nộp</small><b>${a.submitted_at?new Date(a.submitted_at).toLocaleString():"Not submitted"}</b></div><div><small>Attempt · Lần làm</small><b>#${a.attempt_no||1}${a.provisional?" (provisional)":""}</b></div>${dv?`<div><small>Device · Thiết bị</small><b>${esc(dv)}</b></div>`:""}</div>
+<div class="blk"><h3>Skills · Kỹ năng</h3><table class="rpk"><thead><tr><th>Skill</th><th class="n">Points</th><th class="n">%</th><th style="width:34%"></th></tr></thead><tbody>${Object.entries(sk).map(([s,o])=>{const p=o.m?Math.round(o.g/o.m*100):0;return`<tr><td>${esc(s)}</td><td class="n">${nf(o.g)} / ${nf(o.m)}</td><td class="n pp ${tn(p)}">${p}%</td><td><div class="rpmeter"><i class="${tn(p)}" style="width:${Math.min(100,p)}%"></i></div></td></tr>`}).join("")}</tbody></table></div>
 <h3>Exam integrity · Độ tin cậy khi làm bài <span class="rpb ${lv[2]}">${lv[0]} · ${lv[1]}</span></h3>
 <p>${lv[3]}</p>
-<div class="rpx"><b>Hướng dẫn đọc (dành cho phụ huynh)</b><ul><li>Trong lúc làm bài, hệ thống ghi nhận một số thao tác như chuyển sang tab khác, thoát toàn màn hình, sao chép, dán, tua âm thanh.</li><li>Đây <b>không phải bằng chứng gian lận</b>. Thông báo điện thoại, rớt mạng hoặc bấm nhầm cũng có thể tạo ra các ghi nhận này.</li><li>Nên chú ý số lần và việc lặp lại nhiều lần. Vài sự kiện đơn lẻ thường không đáng lo.</li><li>Hệ thống chỉ ghi loại sự kiện và thời điểm. Hệ thống <b>không ghi</b> học sinh đã xem gì ở tab khác và cũng không ghi rời tab bao lâu.</li></ul></div>
-${(rk||[]).length?`<table><tr><th>Event · Sự kiện</th><th>Times · Số lần</th><th>Ý nghĩa</th></tr>${Object.entries(cnt).map(([k,n])=>`<tr><td>${rkh(k)}</td><td>${n}</td><td>${esc(RKX[k]?RKX[k][1]:"")}</td></tr>`).join("")}</table>
-<b class="rps">Full timeline · Nhật ký chi tiết (${rk.length})</b><table class="rpt"><tr><th>#</th><th>Time · Giờ</th><th>Event · Sự kiện</th><th>Technical detail · Chi tiết kỹ thuật</th></tr>${rk.map((x,i)=>`<tr><td>${i+1}</td><td>${new Date(x.occurred_at).toLocaleString()}</td><td>${rkh(x.kind)}</td><td>${rdet(x)}</td></tr>`).join("")}</table>`:'<p class="rps">No flags were recorded · Không ghi nhận sự kiện nào.</p>'}
-<p class="rps">Mức độ được tính từ số lần và loại sự kiện (sao chép/dán tính nặng hơn mất focus): 0 = Không có, 1–3 = Thấp, 4–8 = Trung bình, trên 8 = Cao. Đây chỉ là chỉ báo tham khảo.</p>
-<h3>Answers</h3><table class="rpa"><tr><th>#</th><th>Student answer</th><th>Correct answer</th><th>Points</th><th>Result</th></tr>${Q.map(q=>{const x=idx.get(q.id),s=cst(q,x),ans=String(rtxt(q,x&&x.response)||"–");return `<tr class="${s}"><td>${esc(q.title)}</td><td>${esc(ans.length>300?ans.slice(0,300)+"…":ans)}${x&&x.comment?`<div class="rps">Teacher: ${esc(x.comment)}</div>`:""}</td><td>${esc(ktxt(q))}</td><td>${x&&x.points!=null?x.points:"–"} / ${q.points}</td><td>${SBL[s]||""}</td></tr>`}).join("")}</table></section>`}
+<div class="rpg rpg2"><div class="${nLeave?"on":""}"><small>Số lần rời bài</small><b>${nLeave}</b></div><div class="${away?"on":""}"><small>Tổng thời gian vắng mặt</small><b>${away?dur(away):"0 giây"}</b></div><div class="${longest>=30?"on":""}"><small>Lần vắng lâu nhất</small><b>${longest?dur(longest):"–"}</b></div></div>
+<div class="rpx"><b>Hướng dẫn đọc (dành cho phụ huynh)</b><ul><li>Trong lúc làm bài, hệ thống ghi nhận các thao tác như chuyển sang tab hoặc ứng dụng khác, thoát toàn màn hình, sao chép, dán, tua âm thanh.</li><li>Đây <b>không phải bằng chứng gian lận</b>. Thông báo điện thoại, rớt mạng hoặc bấm nhầm cũng có thể tạo ra các ghi nhận này.</li><li>Nên chú ý số lần, thời gian vắng mặt và việc lặp lại nhiều lần. Vài sự kiện ngắn, đơn lẻ thường không đáng lo.</li><li>Hệ thống ghi lại <b>số giây rời khỏi bài thi</b>, nhưng <b>không ghi</b> học sinh đã xem gì trong thời gian đó.</li></ul></div>
+${EP.length?`<div class="blk"><table class="rpc"><thead><tr><th>Event · Sự kiện</th><th>Times · Số lần</th><th>Ý nghĩa</th></tr></thead><tbody>${Object.entries(cnt).map(([k,n])=>`<tr><td>${rkh(k)}</td><td>${n}</td><td>${esc(RKX[k]?RKX[k][1]:"")}</td></tr>`).join("")}</tbody></table></div>
+<b class="rps">Full timeline · Nhật ký chi tiết${dt?" · "+dt:""} (${EP.length})</b><table class="rpt"><thead><tr><th>#</th><th>Giờ</th><th>Sự kiện</th><th>Diễn biến · What happened</th></tr></thead><tbody>${EP.map((e,i)=>`<tr class="${(e.rd&&+e.rd.away_s>=30)?"w3":(RKW[e.x.kind]>=2?"w2":"")}"><td>${i+1}</td><td>${tm(e.x.occurred_at)}</td><td>${rkh(e.x.kind)}</td><td>${rdesc(e)}</td></tr>`).join("")}</tbody></table>`:'<p class="rps">No flags were recorded · Không ghi nhận sự kiện nào.</p>'}
+<p class="rps">Mức độ được tính từ số lần và loại sự kiện (sao chép/dán tính nặng hơn mất focus; vắng mặt từ 30 giây trở lên tính thêm): 0 = Không có, 1–3 = Thấp, 4–8 = Trung bình, trên 8 = Cao. Đây chỉ là chỉ báo tham khảo.</p>
+<h3>Answers · Chi tiết từng câu</h3><table class="rpa"><thead><tr><th>#</th><th>Student answer</th><th>Correct answer</th><th class="n">Points</th><th>Result</th></tr></thead><tbody>${Q.map(q=>{const x=idx.get(q.id),s=cst(q,x),an=String(rtxt(q,x&&x.response)||"–");return `<tr class="${s}"><td>${esc(q.title)}</td><td>${esc(an.length>300?an.slice(0,300)+"…":an)}${x&&x.comment?`<div class="rps">Teacher: ${esc(x.comment)}</div>`:""}</td><td>${esc(ktxt(q))}</td><td><b>${x&&x.points!=null?nf(x.points):"–"}</b> / ${q.points}</td><td><span class="bd b-${s}">${SBL[s]||""}</span></td></tr>`}).join("")}</tbody></table><div class="rpf"><span>Generated · Xuất lúc ${new Date().toLocaleString()}</span><span>${nm}</span></div></section>`}
 function rptShow(body,name){document.getElementById("rpt")&&document.getElementById("rpt").remove();const d=document.createElement("div");d.id="rpt";d.innerHTML=`<div class="rpbar"><b>${esc(name||"Report")}</b><span><button class="btn pri" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="document.getElementById('rpt').remove()">Close</button></span></div><div class="rpw">${body}</div>`;document.body.appendChild(d)}
 async function rptAtt(aid,rid){const[{data:r},{data:a},{data:an},{data:rk}]=await Promise.all([SB.from("runs").select("snapshot,mode,started_at").eq("id",rid).single(),SB.from("attempts").select("*,profiles(full_name)").eq("id",aid).single(),SB.from("answers").select("question_id,response,points,comment").eq("attempt_id",aid).is("deleted_at",null),SB.from("risk_events").select("kind,detail,occurred_at").eq("attempt_id",aid).order("occurred_at")]);
  if(!r||!a)return alert("Could not load the report.");rptShow(rptOne(r,a,an,rk),"Report")}
