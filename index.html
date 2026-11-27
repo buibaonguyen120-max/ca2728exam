@@ -994,7 +994,7 @@ tr[hidden],.rvq[hidden],.rvs[hidden]{display:none}
 .rvh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rvpt{font-weight:600}
 .rvb{margin-top:8px}.rvb p{margin:0 0 8px}
 .rvo{display:flex;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0}
-.rvo .L{font-weight:700;min-width:22px;white-space:nowrap}
+.rvo .L{font-weight:700;min-width:22px;white-space:nowrap}.rvo.hintk .L{min-width:0}.rvo.hintk.kc .L{background:var(--sf);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--sf) 25%,transparent)}
 .rvo.ok{border-color:var(--sf);background:color-mix(in srgb,var(--sf) 14%,transparent)}
 .rvo.bad{border-color:var(--sw);background:color-mix(in srgb,var(--sw) 14%,transparent)}
 .rvt{font-style:normal;font-size:12px;font-weight:600;white-space:nowrap}
@@ -1085,12 +1085,12 @@ async function stCsv(){if(!RD)return;const{r,at}=RD,id=r.id;if(!RESP[id]||!RESP[
  const s=rows.map(x=>x.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n"),l=document.createElement("a");l.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));l.download=(r.snapshot.title||"results").replace(/[^\w\-]+/g,"_")+"_detail.csv";l.click()}
 function statDraw(f){const h=$("#stx");if(!h||!RD)return;let s;try{s=stHtml()}catch(e){console.error(e);s='<p class="hint">Could not build the breakdown.</p>'}if(!f&&h._h===s)return;h._h=s;h.innerHTML=s}
 {const _r2=rdraw;rdraw=function(){const x=_r2.apply(this,arguments);statDraw();return x}}
-const rvo=(k,t,ok,pk)=>`<div class="rvo ${ok?"ok":pk?"bad":""}${pk?" pk":""}"><span class="L">${esc(k)}</span><span class="grow">${esc(t)}</span>${pk?`<em class="rvt">${ok?"✓ Chosen":"✗ Chosen"}</em>`:ok?`<em class="rvt">Correct answer</em>`:""}</div>`,
+const rvo=(k,t,ok,pk,bl)=>bl?`<div class="rvo hintk${ok?" kc":""}"${ok?' title="Correct answer"':""}><span class="L">${esc(k)}</span><span class="grow">${esc(t)}</span></div>`:`<div class="rvo ${ok?"ok":pk?"bad":""}${pk?" pk":""}"><span class="L">${esc(k)}</span><span class="grow">${esc(t)}</span>${pk?`<em class="rvt">${ok?"✓ Chosen":"✗ Chosen"}</em>`:ok?`<em class="rvt">Correct answer</em>`:""}</div>`,
  rvg=(v,ok)=>v==null||String(v).trim()===""?`<span class="rvg blank">blank</span>`:`<span class="rvg ${ok?"ok":"bad"}">${esc(v)}</span>`,
  rvk=l=>l.length?` <span class="rvk">→ ${esc(l.join(" / "))}</span>`:"";
 function rbody(q,x){const c=q.content||{},k=q.key||{},r=x&&x.response||{},t=q.type;
- if(t=="mcq"||t=="mcq_multi"){const kc=keyList(q),ch=r.choices||(r.choice!=null?[r.choice]:[]);return`<p>${fm(c.prompt)}</p>`+(c.options||[]).map(o=>rvo(o.key,o.text,kc.includes(o.key),ch.includes(o.key))).join("")}
- if(t=="tfng"){const kc=[String(k.correct!=null?acc(k.correct)[0]:k.choice||"").toUpperCase()],ch=r.choice!=null?[String(r.choice).toUpperCase()]:[];return`<p>${fm(c.statement)}</p>`+["TRUE","FALSE","NOT_GIVEN"].map(o=>rvo(o.replace("_"," "),"",kc.includes(o),ch.includes(o))).join("")}
+ if(t=="mcq"||t=="mcq_multi"){const kc=keyList(q),ch=r.choices||(r.choice!=null?[r.choice]:[]);return`<p>${fm(c.prompt)}</p>`+(c.options||[]).map(o=>rvo(o.key,o.text,kc.includes(o.key),ch.includes(o.key),!ch.length)).join("")}
+ if(t=="tfng"){const kc=[String(k.correct!=null?acc(k.correct)[0]:k.choice||"").toUpperCase()],ch=r.choice!=null?[String(r.choice).toUpperCase()]:[];return`<p>${fm(c.statement)}</p>`+["TRUE","FALSE","NOT_GIVEN"].map(o=>rvo(o.replace("_"," "),"",kc.includes(o),ch.includes(o),!ch.length)).join("")}
  if(t=="gap_fill"){const bl=r.blanks||{};return`<p>${String(c.text||"").split(/___(\d+)___/).map((p,j)=>{if(j%2==0)return fm(p);const kb=(k.blanks||{})[p]||{},ls=acc(kb.accept!=null?kb.accept:kb),v=bl[p],ok=v!=null&&String(v).trim()!==""&&ls.some(a=>nz(a,kb.case_sensitive)==nz(v,kb.case_sensitive));return`<sup class="rvn">${esc(p)}</sup>`+rvg(v,ok)+(ok?"":rvk(ls))}).join("")}</p>`}
  if(t=="word_formation"){const ls=acc(k.accept),okf=r.form!=null&&ls.some(a=>nz(a)==nz(r.form));return`<p>${fm(c.text)}</p><div>Answer: ${rvg(r.form,okf)}${okf?"":rvk(ls)}</div>`}
  if(t=="error_id"){const tk=String(c.text||"").split(/\s+/),S=new Set((r.marks||[]).flatMap(m=>m.tokens||[])),K=new Set((k.errors||[]).flatMap(e=>e.tokens||[]));
